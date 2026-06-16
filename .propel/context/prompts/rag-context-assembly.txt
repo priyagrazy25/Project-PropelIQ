@@ -1,0 +1,76 @@
+# RAG Context Assembly Prompt Template
+
+This template defines how retrieved document chunks are assembled into LLM-ready context for clinical document queries.
+
+## Configuration
+- Top-K: 5 (maximum chunks to include)
+- Similarity Threshold: 0.75 (minimum cosine similarity)
+- Recency Weight: 1.2x (boost for documents within 30 days)
+- Max Context Tokens: 4096
+
+## Context Assembly Format
+
+```
+Based on the following clinical document excerpts, provide accurate information.
+Each excerpt includes the source document and relevance score.
+
+CLINICAL CONTEXT:
+================
+
+[1] Source: {filename} (Relevance: {score}%)
+Date: {date}
+---
+{chunk_text}
+---
+
+[2] Source: {filename} (Relevance: {score}%)
+Date: {date}
+---
+{chunk_text}
+---
+
+... (up to 5 chunks)
+
+================
+END OF CONTEXT
+
+Instructions: Use only the information provided above. Cite source documents when possible.
+If the context doesn't contain sufficient information, acknowledge the limitation.
+```
+
+## Empty Context Response
+
+When no relevant chunks are found (similarity < 0.75):
+
+```
+No relevant clinical context found for this query.
+The patient's documents do not contain information matching the search criteria.
+Please verify the query or check if relevant documents have been uploaded.
+```
+
+## Guardrails (AIR-R02, AIR-R03)
+
+1. **Minimum Similarity (AIR-R02)**: Only include chunks with cosine similarity ≥ 0.75
+2. **Top-K Limit**: Never exceed 5 chunks in context
+3. **Recency Boost (AIR-R03)**: Documents within 30 days receive 1.2x score multiplier
+4. **Token Budget**: Total assembled context must not exceed 4096 tokens
+5. **Source Attribution**: Every chunk must include source filename and date
+6. **Truncation**: If chunk exceeds remaining token budget, truncate with "[truncated]" marker
+
+## Hybrid Re-ranking Formula
+
+```
+combined_score = similarity_score × recency_score
+
+where:
+- similarity_score: cosine similarity between query and chunk embeddings
+- recency_score: 1.0 for docs > 30 days old
+                 1.0 to 1.2 (linear) for docs 0-30 days old
+```
+
+## Integration Points
+
+- **EmbeddingService**: Generates query embeddings via Ollama
+- **HybridReranker**: Applies recency weighting to similarity scores
+- **ContextAssembler**: Formats ranked chunks into prompt-ready context
+- **RagRetrievalService**: Orchestrates the full retrieval pipeline

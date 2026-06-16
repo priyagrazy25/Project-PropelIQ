@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<!--
+  WIREFRAME: SCR-014 Document Upload
+  FIDELITY: High | VIEWPORT: 1440x900
+  FLOW: FL-004 Document Upload & Processing
+  NAV-LINKS: SCR-006: wireframe-SCR-006-patient-dashboard.html, SCR-015: wireframe-SCR-015-processing-status.html
+  UXR: UXR-401 (Upload feedback), UXR-402 (Per-file progress)
+  COMPONENTS: FileDropzone(1), ProgressBar(N), Card(N), Button(2), Sidebar, Header
+-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCR-014 Document Upload | Unified Patient Access</title>
+    <style>
+        :root {
+            --color-primary: #1E6F9F;
+            --color-primary-hover: #175F87;
+            --color-secondary: #2D9F83;
+            --color-danger: #D32F2F;
+            --color-warning: #EF6C00;
+            --color-text-primary: #111827;
+            --color-text-secondary: #374151;
+            --color-text-muted: #6B7280;
+            --color-border: #D1D5DB;
+            --color-surface: #FFF;
+            --color-bg: #F9FAFB;
+            --color-gray-100: #F3F4F6;
+            --surface-info: #E8F4FD;
+            --surface-success: #E6F7F1;
+            --surface-danger: #FDECEC;
+            --surface-hover: #F3F4F6;
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-full: 9999px;
+            --shadow-1: 0 1px 3px rgba(0, 0, 0, .1);
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --duration-fast: 150ms;
+            --duration-normal: 200ms;
+            --easing-default: cubic-bezier(.4, 0, .2, 1);
+            --header-height: 64px;
+            --sidebar-width: 256px
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: var(--font-primary);
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--color-text-primary);
+            background: var(--color-bg)
+        }
+
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--space-6);
+            z-index: 100;
+            box-shadow: var(--shadow-1)
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2)
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--color-primary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 18px
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            background: var(--color-primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .sidebar {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--color-surface);
+            border-right: 1px solid var(--color-border);
+            padding: var(--space-4) 0;
+            z-index: 90
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-6);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: background var(--duration-fast) var(--easing-default)
+        }
+
+        .nav-item:hover {
+            background: var(--surface-hover)
+        }
+
+        .nav-item.active {
+            color: var(--color-primary);
+            background: var(--surface-info);
+            border-left-color: var(--color-primary);
+            font-weight: 600
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: var(--space-8);
+            max-width: 800px
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: 14px;
+            margin-bottom: var(--space-6)
+        }
+
+        .breadcrumb a {
+            color: var(--color-primary);
+            text-decoration: none
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline
+        }
+
+        .breadcrumb span {
+            color: var(--color-text-muted)
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: var(--space-2)
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-8)
+        }
+
+        /* DROPZONE */
+        .dropzone {
+            border: 2px dashed var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-12) var(--space-8);
+            text-align: center;
+            background: var(--color-surface);
+            cursor: pointer;
+            transition: all var(--duration-fast) var(--easing-default);
+            margin-bottom: var(--space-6)
+        }
+
+        .dropzone:hover,
+        .dropzone.dragover {
+            border-color: var(--color-primary);
+            background: var(--surface-info)
+        }
+
+        .dropzone:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px
+        }
+
+        .dropzone-icon {
+            font-size: 48px;
+            margin-bottom: var(--space-3);
+            color: var(--color-primary)
+        }
+
+        .dropzone-text {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: var(--space-1)
+        }
+
+        .dropzone-hint {
+            font-size: 13px;
+            color: var(--color-text-muted)
+        }
+
+        /* FILE LIST */
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+            margin-bottom: var(--space-6)
+        }
+
+        .file-item {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-3) var(--space-4);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3)
+        }
+
+        .file-icon {
+            font-size: 20px;
+            flex-shrink: 0
+        }
+
+        .file-info {
+            flex: 1;
+            min-width: 0
+        }
+
+        .file-name {
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .file-size {
+            font-size: 12px;
+            color: var(--color-text-muted)
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--color-gray-100);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            margin-top: var(--space-1)
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: var(--radius-full);
+            transition: width var(--duration-normal) var(--easing-default)
+        }
+
+        .progress-fill.uploading {
+            background: var(--color-primary)
+        }
+
+        .progress-fill.complete {
+            background: var(--color-secondary)
+        }
+
+        .progress-fill.error {
+            background: var(--color-danger)
+        }
+
+        .file-status {
+            font-size: 12px;
+            font-weight: 500;
+            flex-shrink: 0
+        }
+
+        .status-complete {
+            color: var(--color-secondary)
+        }
+
+        .status-uploading {
+            color: var(--color-primary)
+        }
+
+        .status-error {
+            color: var(--color-danger)
+        }
+
+        .file-action {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--color-text-muted);
+            padding: var(--space-1)
+        }
+
+        .file-action:hover {
+            color: var(--color-danger)
+        }
+
+        .file-action:focus-visible {
+            outline: 2px solid var(--color-primary);
+            border-radius: var(--radius-sm)
+        }
+
+        .btn {
+            height: 40px;
+            padding: 0 var(--space-4);
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: background var(--duration-fast) var(--easing-default)
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: #fff
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover)
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--color-text-muted)
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface-hover)
+        }
+
+        .btn-lg {
+            height: 48px;
+            font-size: 16px;
+            padding: 0 var(--space-6)
+        }
+
+        .action-bar {
+            display: flex;
+            gap: var(--space-3)
+        }
+
+        @media(max-width:768px) {
+            .sidebar {
+                display: none
+            }
+
+            .main-content {
+                margin-left: 0
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="app-header" role="banner"><a href="wireframe-SCR-006-patient-dashboard.html" class="logo"><span
+                class="logo-icon" aria-hidden="true">+</span> Unified Patient Access</a>
+        <div><span class="avatar" role="button" tabindex="0" aria-label="User menu">JD</span></div>
+    </header>
+    <nav class="sidebar" role="navigation" aria-label="Sidebar navigation"><a
+            href="wireframe-SCR-006-patient-dashboard.html" class="nav-item"><span class="nav-icon">📊</span>
+            Dashboard</a><a href="wireframe-SCR-004-provider-search.html" class="nav-item"><span
+                class="nav-icon">🔍</span> Book Appointment</a><a href="wireframe-SCR-010-ai-intake.html"
+            class="nav-item"><span class="nav-icon">📋</span> Intake</a><a href="wireframe-SCR-014-document-upload.html"
+            class="nav-item active" aria-current="page"><span class="nav-icon">📄</span> Documents</a><a
+            href="wireframe-SCR-016-360-degree-view.html" class="nav-item"><span class="nav-icon">❤️</span> Health
+            Profile</a><a href="wireframe-SCR-007-waitlist-status.html" class="nav-item"><span class="nav-icon">⏳</span>
+            Waitlist</a></nav>
+    <main class="main-content" role="main">
+        <nav class="breadcrumb" aria-label="Breadcrumb"><a
+                href="wireframe-SCR-006-patient-dashboard.html">Dashboard</a><span aria-hidden="true">›</span><span
+                aria-current="page">Upload Documents</span></nav>
+        <h1 class="page-title">Upload Clinical Documents</h1>
+        <p class="page-subtitle">Upload PDF, JPEG, PNG, or TIFF files. Max 10 files, 25 MB each.</p>
+        <div class="dropzone" role="button" tabindex="0" aria-label="Upload files. Drag and drop or click to browse.">
+            <div class="dropzone-icon" aria-hidden="true">📤</div>
+            <div class="dropzone-text">Drag & drop files here</div>
+            <div class="dropzone-hint">or click to browse · PDF, JPEG, PNG, TIFF · Max 25 MB each</div>
+        </div>
+        <div class="file-list" aria-label="Uploaded files">
+            <div class="file-item"><span class="file-icon" aria-hidden="true">📄</span>
+                <div class="file-info">
+                    <div class="file-name">lab_results_2024.pdf</div>
+                    <div class="file-size">2.4 MB</div>
+                    <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0"
+                        aria-valuemax="100">
+                        <div class="progress-fill complete" style="width:100%"></div>
+                    </div>
+                </div><span class="file-status status-complete">✓ Complete</span><button class="file-action"
+                    aria-label="Remove lab_results_2024.pdf">✕</button>
+            </div>
+            <div class="file-item"><span class="file-icon" aria-hidden="true">📄</span>
+                <div class="file-info">
+                    <div class="file-name">radiology_report_chest.pdf</div>
+                    <div class="file-size">5.1 MB</div>
+                    <div class="progress-bar" role="progressbar" aria-valuenow="65" aria-valuemin="0"
+                        aria-valuemax="100">
+                        <div class="progress-fill uploading" style="width:65%"></div>
+                    </div>
+                </div><span class="file-status status-uploading">65%</span><button class="file-action"
+                    aria-label="Cancel radiology_report_chest.pdf">✕</button>
+            </div>
+            <div class="file-item"><span class="file-icon" aria-hidden="true">🖼️</span>
+                <div class="file-info">
+                    <div class="file-name">insurance_card_front.jpg</div>
+                    <div class="file-size">1.2 MB</div>
+                    <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0"
+                        aria-valuemax="100">
+                        <div class="progress-fill complete" style="width:100%"></div>
+                    </div>
+                </div><span class="file-status status-complete">✓ Complete</span><button class="file-action"
+                    aria-label="Remove insurance_card_front.jpg">✕</button>
+            </div>
+            <div class="file-item"><span class="file-icon" aria-hidden="true">📄</span>
+                <div class="file-info">
+                    <div class="file-name">corrupted_scan.tiff</div>
+                    <div class="file-size">0.8 MB</div>
+                    <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0"
+                        aria-valuemax="100">
+                        <div class="progress-fill error" style="width:100%"></div>
+                    </div>
+                </div><span class="file-status status-error">Failed</span><button class="file-action"
+                    aria-label="Retry corrupted_scan.tiff" style="color:var(--color-primary)">↻</button>
+            </div>
+        </div>
+        <div class="action-bar">
+            <a href="wireframe-SCR-015-processing-status.html" class="btn btn-primary btn-lg">Process Documents</a>
+            <a href="wireframe-SCR-006-patient-dashboard.html" class="btn btn-ghost btn-lg">Back to Dashboard</a>
+        </div>
+    </main>
+</body>
+
+</html>

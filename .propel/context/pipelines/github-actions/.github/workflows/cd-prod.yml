@@ -1,0 +1,183 @@
+name: Deploy to Production
+
+on:
+  push:
+    tags: ['v*.*.*']
+    # Exclude release candidates
+    tags-ignore: ['v*.*.*-rc*']
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  ci-check:
+    name: CI Verification
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit
+
+  security-check:
+    name: Security Verification
+    uses: ./.github/workflows/security-scan.yml
+    secrets: inherit
+
+  # CICD-033: Performance tests for production
+  performance-tests:
+    name: Performance Baseline Tests
+    runs-on: ubuntu-latest
+    needs: [ci-check]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Run performance tests
+        run: |
+          dotnet test --configuration Release \
+            --filter "Category=Performance" \
+            --results-directory ./TestResults \
+            --logger "junit;LogFileName=perf-results.xml"
+        working-directory: src/Backend
+
+      - name: Upload performance results
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-results
+          path: src/Backend/TestResults/
+
+  # CICD-061: Production deployment with 2 approvals + canary
+  deploy-canary:
+    name: Deploy Canary (10%)
+    runs-on: ubuntu-latest
+    needs: [ci-check, security-check, performance-tests]
+    environment:
+      name: production
+      url: https://upaci-prod-app.azurewebsites.net
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download backend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-artifact
+          path: ./publish
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # Canary: Deploy to staging slot (10% traffic)
+      - name: Deploy to canary slot
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: upaci-prod-app
+          slot-name: canary
+          package: ./publish
+
+      - name: Route 10% traffic to canary
+        run: |
+          az webapp traffic-routing set \
+            --resource-group upaci-prod-rg \
+            --name upaci-prod-app \
+            --distribution canary=10
+
+      # 5 minute observation window
+      - name: Canary observation (5 min)
+        run: |
+          echo "Monitoring canary for 5 minutes..."
+          sleep 300
+
+      - name: Validate canary health
+        run: |
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://upaci-prod-app-canary.azurewebsites.net/health/ready)
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "::error::Canary health check failed"
+            az webapp traffic-routing clear --resource-group upaci-prod-rg --name upaci-prod-app
+            exit 1
+          fi
+
+  # Full rollout after canary validation
+  deploy-full:
+    name: Deploy Full (100%)
+    runs-on: ubuntu-latest
+    needs: [deploy-canary]
+
+    steps:
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # Swap canary to production
+      - name: Swap canary to production
+        run: |
+          az webapp deployment slot swap \
+            --resource-group upaci-prod-rg \
+            --name upaci-prod-app \
+            --slot canary \
+            --target-slot production
+
+      - name: Clear traffic routing
+        run: |
+          az webapp traffic-routing clear \
+            --resource-group upaci-prod-rg \
+            --name upaci-prod-app
+
+      # CICD-052: Final smoke test
+      - name: Production Smoke Test
+        run: |
+          sleep 30
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://upaci-prod-app.azurewebsites.net/health/ready)
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "::error::Production smoke test failed — triggering rollback"
+            exit 1
+          fi
+          echo "Production deployment verified successfully"
+
+  # CICD-053: Automated rollback on failure
+  rollback:
+    name: Rollback Production
+    runs-on: ubuntu-latest
+    needs: [deploy-full]
+    if: failure()
+
+    steps:
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Rollback deployment
+        run: |
+          echo "Rolling back production deployment..."
+          az webapp deployment slot swap \
+            --resource-group upaci-prod-rg \
+            --name upaci-prod-app \
+            --slot canary \
+            --target-slot production
+          az webapp traffic-routing clear \
+            --resource-group upaci-prod-rg \
+            --name upaci-prod-app
+
+      - name: Notify rollback
+        if: always()
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "text": "🚨 PRODUCTION ROLLBACK EXECUTED for upaci-prod-app. Tag: ${{ github.ref_name }}. Commit: ${{ github.sha }}. Action required."
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

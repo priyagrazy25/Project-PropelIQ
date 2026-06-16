@@ -1,0 +1,339 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Scheduling.API</name>
+    </assembly>
+    <members>
+        <member name="T:Scheduling.API.Controllers.AppointmentBookingController">
+            <summary>
+            Appointment booking endpoints for patients.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.AppointmentBookingController.BookAppointment(Scheduling.API.Controllers.BookAppointmentRequest,System.Threading.CancellationToken)">
+            <summary>
+            Books an appointment for the authenticated patient. Idempotent via idempotency key.
+            </summary>
+            <param name="request">Booking request with provider ID, slot ID, and idempotency key.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Booking confirmation with appointment details.</returns>
+            <response code="200">Appointment booked successfully (or idempotent duplicate).</response>
+            <response code="400">Invalid request (missing fields).</response>
+            <response code="409">Slot already taken by another patient.</response>
+        </member>
+        <member name="M:Scheduling.API.Controllers.AppointmentBookingController.CancelAppointment(System.Guid,Scheduling.API.Controllers.CancelAppointmentRequest,System.Threading.CancellationToken)">
+            <summary>
+            Cancels an appointment. Idempotent: returns 204 if already cancelled (AC-5).
+            Releases the slot and triggers swap/waitlist cascade.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.AppointmentBookingController.RescheduleAppointment(System.Guid,Scheduling.API.Controllers.RescheduleAppointmentRequest,System.Threading.CancellationToken)">
+            <summary>
+            Reschedules an appointment to a new slot. Atomically books new slot, cancels old,
+            and triggers swap queue + waitlist cascade for the released slot (AC-2, AC-3).
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.AppointmentBookingController.GetMyAppointments(System.Threading.CancellationToken)">
+            <summary>
+            Returns the authenticated patient's appointments.
+            </summary>
+        </member>
+        <member name="T:Scheduling.API.Controllers.BookAppointmentRequest">
+            <summary>
+            Request body for booking an appointment.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.BookAppointmentRequest.#ctor(System.Guid,System.Guid,System.String)">
+            <summary>
+            Request body for booking an appointment.
+            </summary>
+        </member>
+        <member name="T:Scheduling.API.Controllers.NoShowRiskController">
+            <summary>
+            No-show risk prediction and model management endpoints (AIR-007, AIR-O03).
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.NoShowRiskController.PredictRisk(Scheduling.API.Controllers.PredictRiskRequest,System.Threading.CancellationToken)">
+            <summary>
+            Predicts no-show risk for a single appointment.
+            </summary>
+            <param name="request">Risk prediction input features.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Risk score (0-100) with level and contributing factors.</returns>
+        </member>
+        <member name="M:Scheduling.API.Controllers.NoShowRiskController.GetRiskAssessments(System.DateTime,System.DateTime,System.Threading.CancellationToken)">
+            <summary>
+            Gets risk assessments for all scheduled appointments in a date range.
+            </summary>
+            <param name="startDate">Start date (inclusive).</param>
+            <param name="endDate">End date (inclusive).</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>List of appointment risk assessments sorted by risk score (descending).</returns>
+        </member>
+        <member name="M:Scheduling.API.Controllers.NoShowRiskController.GetModelVersions">
+            <summary>
+            Gets all available model versions.
+            </summary>
+            <returns>List of model versions with metadata.</returns>
+        </member>
+        <member name="M:Scheduling.API.Controllers.NoShowRiskController.RollbackModel(Scheduling.API.Controllers.RollbackRequest,System.Threading.CancellationToken)">
+            <summary>
+            Rolls back to a previous model version (AIR-O03: must be within 15 minutes of deployment).
+            </summary>
+            <param name="request">Rollback request with target version.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Success or failure with message.</returns>
+        </member>
+        <member name="M:Scheduling.API.Controllers.NoShowRiskController.RetrainModel(System.Threading.CancellationToken)">
+            <summary>
+            Triggers model retraining with current data.
+            </summary>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>New model version information.</returns>
+        </member>
+        <member name="M:Scheduling.API.Controllers.NoShowRiskController.SeedTestAppointments(System.Threading.CancellationToken)">
+            <summary>
+            Seeds test scheduled appointments for risk assessment testing (DEV ONLY).
+            </summary>
+        </member>
+        <member name="T:Scheduling.API.Controllers.PredictRiskRequest">
+            <summary>
+            Request for predicting no-show risk.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.PredictRiskRequest.#ctor(System.Guid,System.Guid,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean,System.Int32)">
+            <summary>
+            Request for predicting no-show risk.
+            </summary>
+        </member>
+        <member name="T:Scheduling.API.Controllers.ModelVersionsResponse">
+            <summary>
+            Response containing model versions.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.ModelVersionsResponse.#ctor(System.String,System.Collections.Generic.IReadOnlyList{Scheduling.Application.Abstractions.ModelVersionInfo})">
+            <summary>
+            Response containing model versions.
+            </summary>
+        </member>
+        <member name="T:Scheduling.API.Controllers.RollbackRequest">
+            <summary>
+            Request for model rollback.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.RollbackRequest.#ctor(System.String)">
+            <summary>
+            Request for model rollback.
+            </summary>
+        </member>
+        <member name="T:Scheduling.API.Controllers.RollbackResponse">
+            <summary>
+            Response from model rollback.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.RollbackResponse.#ctor(System.Boolean,System.String,System.String)">
+            <summary>
+            Response from model rollback.
+            </summary>
+        </member>
+        <member name="T:Scheduling.API.Controllers.RetrainResponse">
+            <summary>
+            Response from model retraining.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.RetrainResponse.#ctor(System.Boolean,System.String,System.String)">
+            <summary>
+            Response from model retraining.
+            </summary>
+        </member>
+        <member name="T:Scheduling.API.Controllers.SeedResponse">
+            <summary>
+            Response from seed test data operation.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.SeedResponse.#ctor(System.Boolean,System.Int32,System.String)">
+            <summary>
+            Response from seed test data operation.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.PreferredSlotSwapController.RegisterSwapPreference(Scheduling.API.Controllers.RegisterSwapPreferenceRequest,System.Threading.CancellationToken)">
+            <summary>
+            Registers a preferred slot swap preference for an existing appointment.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.PreferredSlotSwapController.GetSwapPreferences(System.Threading.CancellationToken)">
+            <summary>
+            Gets active swap preferences for the authenticated patient.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.PreferredSlotSwapController.CancelSwapPreference(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Cancels a pending swap preference.
+            </summary>
+        </member>
+        <member name="T:Scheduling.API.Controllers.ProviderSearchController">
+            <summary>
+            Provider search and slot availability endpoints for patient appointment booking.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.ProviderSearchController.GetAvailableProviders(System.Threading.CancellationToken)">
+            <summary>
+            Returns all active providers for walk-in booking selection.
+            </summary>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>List of available providers.</returns>
+            <response code="200">Returns active providers.</response>
+        </member>
+        <member name="M:Scheduling.API.Controllers.ProviderSearchController.Search(System.String,System.String,System.String,System.Nullable{System.DateTime},System.Int32,System.Int32,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Searches providers by name, specialty, location, and date with pagination.
+            </summary>
+            <param name="name">Partial provider name filter.</param>
+            <param name="specialty">Specialty filter.</param>
+            <param name="location">Location filter.</param>
+            <param name="date">Available date filter (defaults to today).</param>
+            <param name="page">Page number (default 1).</param>
+            <param name="pageSize">Results per page (default 20, max 100).</param>
+            <param name="sortBy">Sort order: earliest, name, rating (default earliest).</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Paginated list of providers with available slots.</returns>
+            <response code="200">Returns matching providers.</response>
+        </member>
+        <member name="M:Scheduling.API.Controllers.ProviderSearchController.GetSlots(System.Guid,System.Nullable{System.DateTime},System.Threading.CancellationToken)">
+            <summary>
+            Gets available slots for a specific provider on a given date.
+            </summary>
+            <param name="id">Provider identifier.</param>
+            <param name="date">Date to query slots for (defaults to today).</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>List of time slots for the provider.</returns>
+            <response code="200">Returns provider slots.</response>
+            <response code="404">Provider not found.</response>
+        </member>
+        <member name="T:Scheduling.API.Controllers.AvailableProviderDto">
+            <summary>
+            DTO for available provider listing.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.AvailableProviderDto.#ctor(System.String,System.String,System.String)">
+            <summary>
+            DTO for available provider listing.
+            </summary>
+        </member>
+        <member name="T:Scheduling.API.Controllers.QueueController">
+            <summary>
+            Same-day queue management endpoints for staff (AC-1 through AC-5).
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.QueueController.GetQueueSummary(System.Threading.CancellationToken)">
+            <summary>
+            Returns today's queue summary with entries and statistics (AC-1, AC-4).
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.QueueController.GetTodayQueue(System.Threading.CancellationToken)">
+            <summary>
+            Returns today's queue ordered by arrival time with status indicators (AC-1, AC-4).
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.QueueController.UpdateStatus(System.Guid,Scheduling.Application.DTOs.StatusUpdateRequest,System.Threading.CancellationToken)">
+            <summary>
+            Updates the status of a queue entry with optimistic concurrency (AC-2, AC-5).
+            Valid transitions: Waiting → InProgress | Left | NoShow; InProgress → Completed | Left | NoShow.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.QueueController.MarkArrived(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Marks a same-day appointment as "Arrived" with UTC timestamp (AC-1, AC-4, AC-5).
+            Rejects cancelled, already-arrived, or future-date appointments.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.QueueController.GetMyQueueStatus(System.Threading.CancellationToken)">
+            <summary>
+            Gets the authenticated patient's current queue status (waiting position, wait time).
+            Returns 404 if patient is not currently in the queue.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.WaitlistController.JoinWaitlist(Scheduling.API.Controllers.JoinWaitlistRequest,System.Threading.CancellationToken)">
+            <summary>
+            Enrolls the authenticated patient on the waitlist for a provider with a preferred date range.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.WaitlistController.GetMyWaitlistEntries(System.Threading.CancellationToken)">
+            <summary>
+            Gets the authenticated patient's waitlist entries.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.WaitlistController.RemoveFromWaitlist(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Removes the authenticated patient from a waitlist entry.
+            </summary>
+        </member>
+        <member name="T:Scheduling.API.Controllers.WalkInController">
+            <summary>
+            Staff-only walk-in booking endpoints (AC-1, AC-4).
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.WalkInController.SearchPatients(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Searches for existing patients by name or email (AC-2).
+            </summary>
+            <param name="q">Search query (name or email).</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>List of matching patients.</returns>
+            <response code="200">Matching patients returned.</response>
+            <response code="400">Search query is empty.</response>
+        </member>
+        <member name="M:Scheduling.API.Controllers.WalkInController.BookWalkIn(Scheduling.API.Controllers.WalkInBookingRequest,System.Threading.CancellationToken)">
+            <summary>
+            Creates a walk-in appointment for an existing or new patient (AC-1, AC-3, AC-4).
+            Assigns a same-day slot or enrolls in the walk-in queue with arrival order.
+            Returns queue position for toast notification (AC-5).
+            </summary>
+            <param name="request">Walk-in booking request.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Booking result with queue position.</returns>
+            <response code="200">Walk-in appointment created.</response>
+            <response code="400">Invalid request.</response>
+            <response code="409">Slot concurrency conflict.</response>
+        </member>
+        <member name="M:Scheduling.API.Controllers.WalkInController.CreatePatient(Scheduling.API.Controllers.CreatePatientRequest,System.Threading.CancellationToken)">
+            <summary>
+            Creates a new patient record for walk-in or quick registration (AC-3).
+            </summary>
+            <param name="request">Patient creation request.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Created patient details.</returns>
+            <response code="200">Patient created.</response>
+            <response code="400">Invalid request.</response>
+        </member>
+        <member name="T:Scheduling.API.Controllers.CreatePatientRequest">
+            <summary>
+            Request body for creating a patient.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.CreatePatientRequest.#ctor(System.String,System.String,System.String,System.String)">
+            <summary>
+            Request body for creating a patient.
+            </summary>
+        </member>
+        <member name="T:Scheduling.API.Controllers.PatientCreatedResult">
+            <summary>
+            Response for patient creation.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.PatientCreatedResult.#ctor(System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Response for patient creation.
+            </summary>
+        </member>
+        <member name="T:Scheduling.API.Controllers.WalkInBookingRequest">
+            <summary>
+            Request body for walk-in booking.
+            </summary>
+        </member>
+        <member name="M:Scheduling.API.Controllers.WalkInBookingRequest.#ctor(System.Nullable{System.Guid},System.String,System.String,System.String,System.Nullable{System.DateOnly},System.Guid,System.String)">
+            <summary>
+            Request body for walk-in booking.
+            </summary>
+        </member>
+    </members>
+</doc>

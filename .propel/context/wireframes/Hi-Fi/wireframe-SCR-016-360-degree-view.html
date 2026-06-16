@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<!--
+  WIREFRAME: SCR-016 360-Degree View
+  FIDELITY: High | VIEWPORT: 1440x900
+  FLOW: FL-004, FL-005
+  NAV-LINKS: SCR-006: wireframe-SCR-006-patient-dashboard.html, SCR-017: wireframe-SCR-017-conflict-resolution.html
+  UXR: UXR-501 (Consolidated view), UXR-502 (Confidence scores visible), UXR-503 (Conflict indicators)
+  COMPONENTS: Tabs(6), Card(N), Table(N), Badge(N), Tag(N), Alert(N), Sidebar, Header
+-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCR-016 360° Patient View | Unified Patient Access</title>
+    <style>
+        :root {
+            --color-primary: #1E6F9F;
+            --color-primary-hover: #175F87;
+            --color-secondary: #2D9F83;
+            --color-danger: #D32F2F;
+            --color-warning: #EF6C00;
+            --color-text-primary: #111827;
+            --color-text-secondary: #374151;
+            --color-text-muted: #6B7280;
+            --color-border: #D1D5DB;
+            --color-surface: #FFF;
+            --color-bg: #F9FAFB;
+            --color-gray-100: #F3F4F6;
+            --surface-info: #E8F4FD;
+            --surface-success: #E6F7F1;
+            --surface-warning: #FFF3E0;
+            --surface-danger: #FDECEC;
+            --surface-hover: #F3F4F6;
+            --confidence-high: #2D9F83;
+            --confidence-medium: #EF6C00;
+            --confidence-low: #D32F2F;
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-full: 9999px;
+            --shadow-1: 0 1px 3px rgba(0, 0, 0, .1);
+            --shadow-2: 0 4px 6px rgba(0, 0, 0, .1);
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --space-10: 40px;
+            --duration-fast: 150ms;
+            --easing-default: cubic-bezier(.4, 0, .2, 1);
+            --header-height: 64px;
+            --sidebar-width: 256px
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: var(--font-primary);
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--color-text-primary);
+            background: var(--color-bg)
+        }
+
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--space-6);
+            z-index: 100;
+            box-shadow: var(--shadow-1)
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2)
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--color-primary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 18px
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            background: var(--color-primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .sidebar {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--color-surface);
+            border-right: 1px solid var(--color-border);
+            padding: var(--space-4) 0;
+            z-index: 90
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-6);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: background var(--duration-fast) var(--easing-default)
+        }
+
+        .nav-item:hover {
+            background: var(--surface-hover)
+        }
+
+        .nav-item.active {
+            color: var(--color-primary);
+            background: var(--surface-info);
+            border-left-color: var(--color-primary);
+            font-weight: 600
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: var(--space-6);
+            min-height: calc(100vh - var(--header-height))
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: 14px;
+            margin-bottom: var(--space-4)
+        }
+
+        .breadcrumb a {
+            color: var(--color-primary);
+            text-decoration: none
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline
+        }
+
+        .breadcrumb span {
+            color: var(--color-text-muted)
+        }
+
+        /* PATIENT HEADER */
+        .patient-banner {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-5);
+            display: flex;
+            align-items: center;
+            gap: var(--space-5);
+            margin-bottom: var(--space-6);
+            box-shadow: var(--shadow-1)
+        }
+
+        .patient-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: var(--radius-full);
+            background: var(--surface-info);
+            color: var(--color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            flex-shrink: 0
+        }
+
+        .patient-name {
+            font-size: 24px;
+            font-weight: 700
+        }
+
+        .patient-meta {
+            font-size: 14px;
+            color: var(--color-text-muted);
+            margin-top: 2px
+        }
+
+        .patient-badges {
+            display: flex;
+            gap: var(--space-2);
+            margin-top: var(--space-2)
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--color-border);
+            margin-bottom: var(--space-5);
+            overflow-x: auto
+        }
+
+        .tab-btn {
+            padding: var(--space-3) var(--space-4);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            white-space: nowrap;
+            transition: all var(--duration-fast) var(--easing-default)
+        }
+
+        .tab-btn:hover {
+            color: var(--color-text-primary)
+        }
+
+        .tab-btn.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+            font-weight: 600
+        }
+
+        .tab-btn:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: -2px
+        }
+
+        /* TABLES */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-1);
+            margin-bottom: var(--space-6)
+        }
+
+        .data-table thead {
+            background: var(--color-gray-100)
+        }
+
+        .data-table th {
+            padding: var(--space-3) var(--space-4);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            text-align: left
+        }
+
+        .data-table td {
+            padding: var(--space-3) var(--space-4);
+            font-size: 14px;
+            border-top: 1px solid var(--color-border)
+        }
+
+        .data-table tbody tr:hover {
+            background: var(--surface-hover)
+        }
+
+        .code {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            background: var(--color-gray-100);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm)
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px var(--space-2);
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 500
+        }
+
+        .badge-success {
+            background: var(--surface-success);
+            color: var(--color-secondary)
+        }
+
+        .badge-warning {
+            background: var(--surface-warning);
+            color: var(--color-warning)
+        }
+
+        .badge-danger {
+            background: var(--surface-danger);
+            color: var(--color-danger)
+        }
+
+        .badge-info {
+            background: var(--surface-info);
+            color: var(--color-primary)
+        }
+
+        .confidence {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: var(--radius-sm)
+        }
+
+        .conf-high {
+            background: var(--surface-success);
+            color: var(--confidence-high)
+        }
+
+        .conf-med {
+            background: var(--surface-warning);
+            color: var(--confidence-medium)
+        }
+
+        .conf-low {
+            background: var(--surface-danger);
+            color: var(--confidence-low)
+        }
+
+        /* ALERT */
+        .alert {
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-5)
+        }
+
+        .alert-warning {
+            background: var(--surface-warning);
+            color: var(--color-warning);
+            border: 1px solid #FFD699
+        }
+
+        .alert a {
+            color: inherit;
+            font-weight: 600;
+            text-decoration: underline
+        }
+
+        .btn {
+            height: 32px;
+            padding: 0 var(--space-3);
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: background var(--duration-fast) var(--easing-default)
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--color-primary)
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface-info)
+        }
+
+        @media(max-width:768px) {
+            .sidebar {
+                display: none
+            }
+
+            .main-content {
+                margin-left: 0
+            }
+
+            .patient-banner {
+                flex-direction: column;
+                text-align: center
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="app-header" role="banner"><a href="wireframe-SCR-006-patient-dashboard.html" class="logo"><span
+                class="logo-icon" aria-hidden="true">+</span> Unified Patient Access</a>
+        <div><span class="avatar" role="button" tabindex="0" aria-label="User menu">JD</span></div>
+    </header>
+    <nav class="sidebar" role="navigation" aria-label="Sidebar navigation"><a
+            href="wireframe-SCR-006-patient-dashboard.html" class="nav-item"><span class="nav-icon">📊</span>
+            Dashboard</a><a href="wireframe-SCR-004-provider-search.html" class="nav-item"><span
+                class="nav-icon">🔍</span> Book Appointment</a><a href="wireframe-SCR-010-ai-intake.html"
+            class="nav-item"><span class="nav-icon">📋</span> Intake</a><a href="wireframe-SCR-014-document-upload.html"
+            class="nav-item"><span class="nav-icon">📄</span> Documents</a><a
+            href="wireframe-SCR-016-360-degree-view.html" class="nav-item active" aria-current="page"><span
+                class="nav-icon">❤️</span> Health Profile</a><a href="wireframe-SCR-007-waitlist-status.html"
+            class="nav-item"><span class="nav-icon">⏳</span> Waitlist</a></nav>
+    <main class="main-content" role="main">
+        <nav class="breadcrumb" aria-label="Breadcrumb"><a
+                href="wireframe-SCR-006-patient-dashboard.html">Dashboard</a><span aria-hidden="true">›</span><span
+                aria-current="page">Health Profile</span></nav>
+        <!-- PATIENT BANNER -->
+        <div class="patient-banner">
+            <div class="patient-avatar" aria-hidden="true">JD</div>
+            <div>
+                <div class="patient-name">Jane Doe</div>
+                <div class="patient-meta">DOB: March 15, 1985 · Female · MRN: PAT-2024-001234</div>
+                <div class="patient-badges"><span class="badge badge-success">Intake Complete</span><span
+                        class="badge badge-info">5 Documents</span><span class="badge badge-warning">1 Conflict</span>
+                </div>
+            </div>
+        </div>
+        <!-- CONFLICT ALERT -->
+        <div class="alert alert-warning" role="alert">
+            <span aria-hidden="true">⚠️</span>
+            <span>1 data conflict detected. <a href="wireframe-SCR-017-conflict-resolution.html">Resolve now</a></span>
+        </div>
+        <!-- TABS -->
+        <div class="tabs" role="tablist" aria-label="Patient data sections">
+            <button class="tab-btn active" role="tab" aria-selected="true">Demographics</button>
+            <button class="tab-btn" role="tab" aria-selected="false">Medications</button>
+            <button class="tab-btn" role="tab" aria-selected="false">Diagnoses</button>
+            <button class="tab-btn" role="tab" aria-selected="false">Labs</button>
+            <button class="tab-btn" role="tab" aria-selected="false">Encounters</button>
+            <button class="tab-btn" role="tab" aria-selected="false">Conflicts</button>
+        </div>
+        <!-- DEMOGRAPHICS TAB (active) -->
+        <table class="data-table" role="table">
+            <thead>
+                <tr>
+                    <th scope="col">Field</th>
+                    <th scope="col">Value</th>
+                    <th scope="col">Source</th>
+                    <th scope="col">Confidence</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Full Name</td>
+                    <td>Jane Marie Doe</td>
+                    <td>Intake Form</td>
+                    <td><span class="confidence conf-high">98%</span></td>
+                </tr>
+                <tr>
+                    <td>Date of Birth</td>
+                    <td>March 15, 1985</td>
+                    <td>Intake Form</td>
+                    <td><span class="confidence conf-high">99%</span></td>
+                </tr>
+                <tr>
+                    <td>Phone</td>
+                    <td>(555) 123-4567</td>
+                    <td>Intake Form</td>
+                    <td><span class="confidence conf-high">97%</span></td>
+                </tr>
+                <tr>
+                    <td>Address</td>
+                    <td>123 Main St, Suite 4, Springfield, IL 62701</td>
+                    <td>Insurance Card OCR</td>
+                    <td><span class="confidence conf-med">82%</span></td>
+                </tr>
+                <tr>
+                    <td>Insurance Provider</td>
+                    <td>Blue Cross Blue Shield</td>
+                    <td>Insurance Card OCR</td>
+                    <td><span class="confidence conf-high">95%</span></td>
+                </tr>
+                <tr>
+                    <td>Allergies</td>
+                    <td>Penicillin (Severe), Shellfish (Moderate)</td>
+                    <td>AI Intake</td>
+                    <td><span class="confidence conf-high">94%</span></td>
+                </tr>
+                <tr>
+                    <td>Blood Type</td>
+                    <td>O+</td>
+                    <td>Lab Report OCR</td>
+                    <td><span class="confidence conf-med">78%</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+</body>
+
+</html>

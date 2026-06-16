@@ -1,0 +1,38 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Host/Host.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Clinical/">
+    <Project Path="src/Modules/Clinical/Clinical.API/Clinical.API.csproj" />
+    <Project Path="src/Modules/Clinical/Clinical.Application/Clinical.Application.csproj" />
+    <Project Path="src/Modules/Clinical/Clinical.Domain/Clinical.Domain.csproj" />
+    <Project Path="src/Modules/Clinical/Clinical.Infrastructure/Clinical.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Identity/">
+    <Project Path="src/Modules/Identity/Identity.API/Identity.API.csproj" />
+    <Project Path="src/Modules/Identity/Identity.Application/Identity.Application.csproj" />
+    <Project Path="src/Modules/Identity/Identity.Domain/Identity.Domain.csproj" />
+    <Project Path="src/Modules/Identity/Identity.Infrastructure/Identity.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Notification/">
+    <Project Path="src/Modules/Notification/Notification.API/Notification.API.csproj" />
+    <Project Path="src/Modules/Notification/Notification.Application/Notification.Application.csproj" />
+    <Project Path="src/Modules/Notification/Notification.Domain/Notification.Domain.csproj" />
+    <Project Path="src/Modules/Notification/Notification.Infrastructure/Notification.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Scheduling/">
+    <Project Path="src/Modules/Scheduling/Scheduling.API/Scheduling.API.csproj" />
+    <Project Path="src/Modules/Scheduling/Scheduling.Application/Scheduling.Application.csproj" />
+    <Project Path="src/Modules/Scheduling/Scheduling.Domain/Scheduling.Domain.csproj" />
+    <Project Path="src/Modules/Scheduling/Scheduling.Infrastructure/Scheduling.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/SharedKernel/SharedKernel.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/UnitTests/UnitTests.csproj" />
+    <Project Path="tests/IntegrationTests/IntegrationTests.csproj" />
+    <Project Path="tests/E2ETests/E2ETests.csproj" />
+  </Folder>
+</Solution>

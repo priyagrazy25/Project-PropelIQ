@@ -1,0 +1,81 @@
+name: Deploy to Dev
+
+on:
+  push:
+    branches: [develop]
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  ci-check:
+    name: CI Verification
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit
+
+  # CICD-050: Deploy to dev (rolling update)
+  deploy-dev:
+    name: Deploy to Dev
+    runs-on: ubuntu-latest
+    needs: [ci-check]
+    environment:
+      name: dev
+      url: https://upaci-dev-app.azurewebsites.net
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download backend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-artifact
+          path: ./publish
+
+      # CICD-051: Validate prerequisites
+      - name: Validate deployment prerequisites
+        run: |
+          echo "Checking dev environment health..."
+          # Placeholder: curl health endpoint
+
+      # SEC-020: OIDC authentication — no long-lived credentials
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # CICD-054: Database migration
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Run EF Migrations
+        run: |
+          dotnet tool install --global dotnet-ef
+          dotnet ef database update --project src/Backend/src/Infrastructure --startup-project src/Backend/src/API
+        env:
+          ConnectionStrings__DefaultConnection: ${{ secrets.DEV_SQL_CONNECTION }}
+
+      # CICD-050: Rolling deploy
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: upaci-dev-app
+          package: ./publish
+
+      # CICD-052: Post-deployment smoke tests
+      - name: Smoke Test
+        run: |
+          sleep 30
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://upaci-dev-app.azurewebsites.net/health/live)
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "::error::Smoke test failed: /health/live returned $HTTP_STATUS"
+            exit 1
+          fi
+          echo "Smoke test passed: /health/live returned 200"

@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<!--
+  WIREFRAME: SCR-022 No-Show Risk Assessment
+  FIDELITY: High | VIEWPORT: 1440x900
+  FLOW: FL-006 Staff Portal Hub
+  NAV-LINKS: SCR-021: wireframe-SCR-021-staff-dashboard.html, SCR-016: wireframe-SCR-016-360-degree-view.html
+  UXR: UXR-501 (Risk assessment < 3 sec), UXR-301 (Confidence scores)
+  COMPONENTS: Table, Badge(confidence), Select(1), Sidebar(Staff), Header
+-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCR-022 No-Show Risk | Unified Patient Access</title>
+    <style>
+        :root {
+            --color-primary: #1E6F9F;
+            --color-primary-hover: #175F87;
+            --color-secondary: #2D9F83;
+            --color-danger: #D32F2F;
+            --color-warning: #F59E0B;
+            --color-text-primary: #111827;
+            --color-text-secondary: #374151;
+            --color-text-muted: #6B7280;
+            --color-border: #D1D5DB;
+            --color-surface: #FFF;
+            --color-bg: #F9FAFB;
+            --color-gray-100: #F3F4F6;
+            --surface-info: #E8F4FD;
+            --surface-hover: #F3F4F6;
+            --surface-success: #E8F5E9;
+            --surface-warning: #FFF8E1;
+            --surface-danger: #FDECEA;
+            --confidence-high: #2E7D32;
+            --confidence-medium: #F59E0B;
+            --confidence-low: #D32F2F;
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-full: 9999px;
+            --shadow-1: 0 1px 3px rgba(0, 0, 0, .1);
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --duration-fast: 150ms;
+            --easing-default: cubic-bezier(.4, 0, .2, 1);
+            --header-height: 64px;
+            --sidebar-width: 256px
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: var(--font-primary);
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--color-text-primary);
+            background: var(--color-bg)
+        }
+
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--space-6);
+            z-index: 100;
+            box-shadow: var(--shadow-1)
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2)
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--color-primary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 18px
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            background: var(--color-secondary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .sidebar {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--color-surface);
+            border-right: 1px solid var(--color-border);
+            padding: var(--space-4) 0;
+            z-index: 90
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-6);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: background var(--duration-fast) var(--easing-default)
+        }
+
+        .nav-item:hover {
+            background: var(--surface-hover)
+        }
+
+        .nav-item.active {
+            color: var(--color-primary);
+            background: var(--surface-info);
+            border-left-color: var(--color-primary);
+            font-weight: 600
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: var(--space-8)
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: 14px;
+            margin-bottom: var(--space-6)
+        }
+
+        .breadcrumb a {
+            color: var(--color-primary);
+            text-decoration: none
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline
+        }
+
+        .breadcrumb span {
+            color: var(--color-text-muted)
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-6)
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700
+        }
+
+        /* Alert Banner */
+        .alert-banner {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-4) var(--space-5);
+            background: var(--surface-danger);
+            border: 1px solid rgba(211, 47, 47, .2);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-6);
+            font-size: 14px;
+            color: #B71C1C
+        }
+
+        .alert-icon {
+            font-size: 20px
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            gap: var(--space-3);
+            margin-bottom: var(--space-5);
+            flex-wrap: wrap
+        }
+
+        .filter-select {
+            height: 36px;
+            padding: 0 var(--space-3);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: 13px;
+            color: var(--color-text-secondary)
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--color-primary)
+        }
+
+        /* Table */
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-1);
+            overflow: hidden
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        th {
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: var(--color-text-muted);
+            padding: var(--space-3) var(--space-4);
+            background: var(--color-gray-100);
+            border-bottom: 1px solid var(--color-border)
+        }
+
+        td {
+            padding: var(--space-3) var(--space-4);
+            font-size: 14px;
+            border-bottom: 1px solid var(--color-border)
+        }
+
+        tr:last-child td {
+            border-bottom: none
+        }
+
+        tr:hover td {
+            background: var(--surface-hover)
+        }
+
+        .patient-link {
+            color: var(--color-primary);
+            text-decoration: none;
+            font-weight: 500
+        }
+
+        .patient-link:hover {
+            text-decoration: underline
+        }
+
+        /* Risk Score + Bar */
+        .risk-cell {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2)
+        }
+
+        .risk-bar-bg {
+            width: 64px;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--color-gray-100);
+            overflow: hidden
+        }
+
+        .risk-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width var(--duration-fast) var(--easing-default)
+        }
+
+        .risk-score {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 600;
+            min-width: 36px
+        }
+
+        .risk-high .risk-bar-fill {
+            background: var(--confidence-low)
+        }
+
+        .risk-high .risk-score {
+            color: var(--confidence-low)
+        }
+
+        .risk-medium .risk-bar-fill {
+            background: var(--confidence-medium)
+        }
+
+        .risk-medium .risk-score {
+            color: var(--confidence-medium)
+        }
+
+        .risk-low .risk-bar-fill {
+            background: var(--confidence-high)
+        }
+
+        .risk-low .risk-score {
+            color: var(--confidence-high)
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 600
+        }
+
+        .badge-high {
+            background: var(--surface-danger);
+            color: var(--color-danger)
+        }
+
+        .badge-medium {
+            background: var(--surface-warning);
+            color: #B45309
+        }
+
+        .badge-low {
+            background: var(--surface-success);
+            color: #2E7D32
+        }
+
+        .factors {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            max-width: 200px
+        }
+
+        .btn {
+            height: 28px;
+            padding: 0 var(--space-2);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-primary);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background var(--duration-fast) var(--easing-default)
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--color-primary);
+            color: var(--color-primary)
+        }
+
+        .btn-outline:hover {
+            background: var(--surface-info)
+        }
+
+        @media(max-width:768px) {
+            .sidebar {
+                display: none
+            }
+
+            .main-content {
+                margin-left: 0
+            }
+
+            .card {
+                overflow-x: auto
+            }
+
+            .filter-bar {
+                flex-direction: column
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="app-header" role="banner"><a href="wireframe-SCR-021-staff-dashboard.html" class="logo"><span
+                class="logo-icon" aria-hidden="true">+</span> Unified Patient Access</a>
+        <div><span class="avatar" role="button" tabindex="0" aria-label="User menu">MK</span></div>
+    </header>
+    <nav class="sidebar" role="navigation" aria-label="Staff navigation">
+        <a href="wireframe-SCR-021-staff-dashboard.html" class="nav-item"><span class="nav-icon">📊</span>
+            Dashboard</a><a href="wireframe-SCR-019-walkin-booking.html" class="nav-item"><span
+                class="nav-icon">🚶</span> Walk-In</a><a href="wireframe-SCR-020-queue-management.html"
+            class="nav-item"><span class="nav-icon">📋</span> Queue</a><a
+            href="wireframe-SCR-017-conflict-resolution.html" class="nav-item"><span class="nav-icon">⚡</span>
+            Conflicts</a><a href="wireframe-SCR-018-code-verification.html" class="nav-item"><span
+                class="nav-icon">🔢</span> Codes</a><a href="wireframe-SCR-022-noshow-risk.html" class="nav-item active"
+            aria-current="page"><span class="nav-icon">⚠️</span> Risk</a><a
+            href="wireframe-SCR-016-360-degree-view.html" class="nav-item"><span class="nav-icon">👤</span> Patient
+            View</a>
+    </nav>
+    <main class="main-content" role="main">
+        <nav class="breadcrumb" aria-label="Breadcrumb"><a
+                href="wireframe-SCR-021-staff-dashboard.html">Dashboard</a><span aria-hidden="true">›</span><span
+                aria-current="page">No-Show Risk</span></nav>
+        <div class="page-header">
+            <h1 class="page-title">No-Show Risk Assessment</h1>
+        </div>
+        <div class="alert-banner" role="alert"><span class="alert-icon" aria-hidden="true">🚨</span><strong>3
+                patients</strong> with high no-show risk in today's schedule — consider proactive outreach.</div>
+        <div class="filter-bar">
+            <select class="filter-select" aria-label="Risk level filter">
+                <option>All Risk Levels</option>
+                <option>High</option>
+                <option>Medium</option>
+                <option>Low</option>
+            </select>
+            <select class="filter-select" aria-label="Time range">
+                <option>Today</option>
+                <option>Next 7 Days</option>
+                <option>Next 30 Days</option>
+            </select>
+            <select class="filter-select" aria-label="Provider filter">
+                <option>All Providers</option>
+                <option>Dr. Sarah Mitchell</option>
+                <option>Dr. Robert Johnson</option>
+            </select>
+        </div>
+        <div class="card">
+            <table role="grid" aria-label="No-show risk patients">
+                <thead>
+                    <tr>
+                        <th scope="col">Patient</th>
+                        <th scope="col">Appointment</th>
+                        <th scope="col">Provider</th>
+                        <th scope="col">Risk Score</th>
+                        <th scope="col">Risk Level</th>
+                        <th scope="col">Contributing Factors</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a class="patient-link" href="wireframe-SCR-016-360-degree-view.html">Amy Foster</a></td>
+                        <td>Today 2:00 PM</td>
+                        <td>Dr. Mitchell</td>
+                        <td>
+                            <div class="risk-cell risk-high"><span class="risk-score">92%</span>
+                                <div class="risk-bar-bg">
+                                    <div class="risk-bar-fill" style="width:92%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge badge-high">High</span></td>
+                        <td class="factors">3 prior no-shows, no insurance, no reminder response</td>
+                        <td><button class="btn btn-outline">Send Reminder</button></td>
+                    </tr>
+                    <tr>
+                        <td><a class="patient-link" href="wireframe-SCR-016-360-degree-view.html">Kevin Brown</a></td>
+                        <td>Today 3:30 PM</td>
+                        <td>Dr. Johnson</td>
+                        <td>
+                            <div class="risk-cell risk-high"><span class="risk-score">85%</span>
+                                <div class="risk-bar-bg">
+                                    <div class="risk-bar-fill" style="width:85%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge badge-high">High</span></td>
+                        <td class="factors">2 prior no-shows, transportation barrier</td>
+                        <td><button class="btn btn-outline">Send Reminder</button></td>
+                    </tr>
+                    <tr>
+                        <td><a class="patient-link" href="wireframe-SCR-016-360-degree-view.html">Maria Lopez</a></td>
+                        <td>Today 4:15 PM</td>
+                        <td>Dr. Mitchell</td>
+                        <td>
+                            <div class="risk-cell risk-high"><span class="risk-score">78%</span>
+                                <div class="risk-bar-bg">
+                                    <div class="risk-bar-fill" style="width:78%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge badge-high">High</span></td>
+                        <td class="factors">1 prior no-show, new patient, long wait last visit</td>
+                        <td><button class="btn btn-outline">Send Reminder</button></td>
+                    </tr>
+                    <tr>
+                        <td><a class="patient-link" href="wireframe-SCR-016-360-degree-view.html">James Wilson</a></td>
+                        <td>Tomorrow 9:00 AM</td>
+                        <td>Dr. Johnson</td>
+                        <td>
+                            <div class="risk-cell risk-medium"><span class="risk-score">55%</span>
+                                <div class="risk-bar-bg">
+                                    <div class="risk-bar-fill" style="width:55%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge badge-medium">Medium</span></td>
+                        <td class="factors">1 prior reschedule, confirmed late last time</td>
+                        <td><button class="btn btn-outline">Send Reminder</button></td>
+                    </tr>
+                    <tr>
+                        <td><a class="patient-link" href="wireframe-SCR-016-360-degree-view.html">Sarah Park</a></td>
+                        <td>Tomorrow 10:30 AM</td>
+                        <td>Dr. Mitchell</td>
+                        <td>
+                            <div class="risk-cell risk-low"><span class="risk-score">18%</span>
+                                <div class="risk-bar-bg">
+                                    <div class="risk-bar-fill" style="width:18%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge badge-low">Low</span></td>
+                        <td class="factors">No prior no-shows, confirmed via SMS</td>
+                        <td><button class="btn btn-outline">Send Reminder</button></td>
+                    </tr>
+                    <tr>
+                        <td><a class="patient-link" href="wireframe-SCR-016-360-degree-view.html">Lisa Chen</a></td>
+                        <td>Tomorrow 1:00 PM</td>
+                        <td>Dr. Johnson</td>
+                        <td>
+                            <div class="risk-cell risk-low"><span class="risk-score">12%</span>
+                                <div class="risk-bar-bg">
+                                    <div class="risk-bar-fill" style="width:12%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge badge-low">Low</span></td>
+                        <td class="factors">Consistent attendance, calendar synced</td>
+                        <td><button class="btn btn-outline">Send Reminder</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+
+</html>

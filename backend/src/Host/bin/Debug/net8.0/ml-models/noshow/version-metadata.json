@@ -1,0 +1,17 @@
+{
+  "CurrentVersion": "v20260610-064726",
+  "PreviousActiveVersion": null,
+  "ActivationTimestamp": null,
+  "Versions": [
+    {
+      "Version": "v20260610-064726",
+      "TrainedAt": "2026-06-10T06:47:26.8785365Z",
+      "Accuracy": 0.7740993184031159,
+      "AUC": 0.7983132117475811,
+      "F1Score": 0.6133333333333333,
+      "TrainingSamples": 5000,
+      "ModelPath": "c:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Host\\bin\\Debug\\net8.0\\ml-models\\noshow\\noshow-model-v20260610-064726.zip",
+      "IsActive": true
+    }
+  ]
+}

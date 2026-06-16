@@ -1,0 +1,147 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 0 * * 0' # Weekly Sunday midnight
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  # CICD-020: SAST with CodeQL
+  sast:
+    name: SAST - CodeQL
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['csharp', 'javascript-typescript']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      # CICD-024: Fail on CRITICAL/HIGH
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
+
+  # CICD-021: SCA with Snyk
+  sca:
+    name: SCA - Dependency Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore .NET dependencies
+        run: dotnet restore
+        working-directory: src/Backend
+
+      # CICD-024: Fail on high severity
+      - name: Snyk .NET scan
+        uses: snyk/actions/dotnet@master
+        continue-on-error: false
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --file=src/Backend/**/*.csproj
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: src/Frontend
+
+      - name: Snyk npm scan
+        uses: snyk/actions/node@master
+        continue-on-error: false
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --file=src/Frontend/package.json
+
+  # CICD-022: Container image scan
+  container-scan:
+    name: Container Scan - Trivy
+    runs-on: ubuntu-latest
+    if: github.event_name != 'schedule'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t upaci-backend:scan src/Backend
+
+      # CICD-024: Fail on CRITICAL
+      - name: Scan with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'upaci-backend:scan'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # CICD-023: Secrets detection
+  secrets-scan:
+    name: Secrets Detection - GitLeaks
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run GitLeaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # CICD-025: IaC security scan
+  iac-scan:
+    name: IaC Security - tfsec
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: tfsec Azure modules
+        uses: aquasecurity/tfsec-action@v1.0.3
+        with:
+          working_directory: .propel/context/iac/azure/terraform/
+          soft_fail: false
+
+      - name: tfsec GCP modules
+        uses: aquasecurity/tfsec-action@v1.0.3
+        with:
+          working_directory: .propel/context/iac/gcp/terraform/
+          soft_fail: false

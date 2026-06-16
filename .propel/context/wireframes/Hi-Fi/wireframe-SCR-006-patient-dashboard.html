@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<!--
+  WIREFRAME: SCR-006 Patient Dashboard
+  FIDELITY: High
+  VIEWPORT: 1440x900 (Desktop)
+  FLOW: FL-001 (entry), FL-002, FL-003, FL-004
+  NAV-LINKS:
+    - SCR-004 Provider Search: wireframe-SCR-004-provider-search.html
+    - SCR-010 AI Intake: wireframe-SCR-010-ai-intake.html
+    - SCR-011 Manual Intake: wireframe-SCR-011-manual-intake.html
+    - SCR-014 Document Upload: wireframe-SCR-014-document-upload.html
+    - SCR-016 360-Degree View: wireframe-SCR-016-360-degree-view.html
+    - SCR-007 Waitlist: wireframe-SCR-007-waitlist-status.html
+    - SCR-008 Reschedule: wireframe-SCR-008-reschedule-cancel.html
+  UXR: UXR-201 (Dashboard load <2s), UXR-202 (Key metrics visible)
+  COMPONENTS: Card(N), Tabs(1), Badge(N), Button(N), Table(1), Sidebar, Header
+-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCR-006 Patient Dashboard | Unified Patient Access</title>
+    <style>
+        :root {
+            --color-primary: #1E6F9F;
+            --color-primary-hover: #175F87;
+            --color-secondary: #2D9F83;
+            --color-danger: #D32F2F;
+            --color-warning: #EF6C00;
+            --color-text-primary: #111827;
+            --color-text-secondary: #374151;
+            --color-text-muted: #6B7280;
+            --color-border: #D1D5DB;
+            --color-surface: #FFFFFF;
+            --color-bg: #F9FAFB;
+            --color-gray-100: #F3F4F6;
+            --surface-info: #E8F4FD;
+            --surface-success: #E6F7F1;
+            --surface-warning: #FFF3E0;
+            --surface-danger: #FDECEC;
+            --surface-hover: #F3F4F6;
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-full: 9999px;
+            --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-2: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --duration-fast: 150ms;
+            --easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+            --header-height: 64px;
+            --sidebar-width: 256px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--color-text-primary);
+            background: var(--color-bg);
+        }
+
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--space-6);
+            z-index: 100;
+            box-shadow: var(--shadow-1);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--color-primary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .notif-btn {
+            position: relative;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: var(--space-2);
+            color: var(--color-text-secondary);
+        }
+
+        .notif-btn:focus-visible {
+            outline: 2px solid var(--color-primary);
+            border-radius: var(--radius-sm);
+        }
+
+        .notif-dot {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: var(--color-danger);
+            border-radius: var(--radius-full);
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            background: var(--color-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--color-surface);
+            border-right: 1px solid var(--color-border);
+            padding: var(--space-4) 0;
+            overflow-y: auto;
+            z-index: 90;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-6);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: background var(--duration-fast) var(--easing-default);
+        }
+
+        .nav-item:hover {
+            background: var(--surface-hover);
+        }
+
+        .nav-item.active {
+            color: var(--color-primary);
+            background: var(--surface-info);
+            border-left-color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        .nav-item:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: -2px;
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: var(--space-8);
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-6);
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--color-text-muted);
+            margin-top: 2px;
+        }
+
+        .btn {
+            height: 40px;
+            padding: 0 var(--space-4);
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: background var(--duration-fast) var(--easing-default);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            text-decoration: none;
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface-info);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--color-primary);
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface-hover);
+        }
+
+        .btn-sm {
+            height: 32px;
+            font-size: 13px;
+            padding: 0 var(--space-3);
+        }
+
+        /* SUMMARY CARDS */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-5);
+            margin-bottom: var(--space-8);
+        }
+
+        .summary-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-5);
+            box-shadow: var(--shadow-1);
+            transition: box-shadow var(--duration-fast) var(--easing-default);
+        }
+
+        .summary-card:hover {
+            box-shadow: var(--shadow-2);
+        }
+
+        .summary-icon {
+            font-size: 24px;
+            margin-bottom: var(--space-2);
+        }
+
+        .summary-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+
+        .summary-label {
+            font-size: 13px;
+            color: var(--color-text-muted);
+            margin-top: 2px;
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--color-border);
+            margin-bottom: var(--space-5);
+        }
+
+        .tab-btn {
+            padding: var(--space-3) var(--space-5);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all var(--duration-fast) var(--easing-default);
+        }
+
+        .tab-btn:hover {
+            color: var(--color-text-primary);
+        }
+
+        .tab-btn.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        .tab-btn:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: -2px;
+        }
+
+        /* TABLE */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-1);
+        }
+
+        .data-table thead {
+            background: var(--color-gray-100);
+        }
+
+        .data-table th {
+            padding: var(--space-3) var(--space-4);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: left;
+        }
+
+        .data-table td {
+            padding: var(--space-3) var(--space-4);
+            font-size: 14px;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .data-table tbody tr:hover {
+            background: var(--surface-hover);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px var(--space-2);
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: var(--surface-success);
+            color: var(--color-secondary);
+        }
+
+        .badge-warning {
+            background: var(--surface-warning);
+            color: var(--color-warning);
+        }
+
+        .badge-info {
+            background: var(--surface-info);
+            color: var(--color-primary);
+        }
+
+        .badge-danger {
+            background: var(--surface-danger);
+            color: var(--color-danger);
+        }
+
+        /* SECTIONS */
+        .section {
+            margin-bottom: var(--space-8);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-4);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        /* QUICK ACTIONS */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-4);
+        }
+
+        .action-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-5);
+            text-align: center;
+            text-decoration: none;
+            color: var(--color-text-primary);
+            transition: all var(--duration-fast) var(--easing-default);
+            box-shadow: var(--shadow-1);
+        }
+
+        .action-card:hover {
+            box-shadow: var(--shadow-2);
+            border-color: var(--color-primary);
+            transform: translateY(-1px);
+        }
+
+        .action-card:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
+        }
+
+        .action-icon {
+            font-size: 32px;
+            margin-bottom: var(--space-2);
+        }
+
+        .action-label {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .action-desc {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            margin-top: 2px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="app-header" role="banner">
+        <a href="wireframe-SCR-006-patient-dashboard.html" class="logo"><span class="logo-icon"
+                aria-hidden="true">+</span> Unified Patient Access</a>
+        <div class="header-actions">
+            <button class="notif-btn" aria-label="Notifications (2 unread)">🔔<span class="notif-dot"
+                    aria-hidden="true"></span></button>
+            <span class="avatar" aria-label="User menu" role="button" tabindex="0">JD</span>
+        </div>
+    </header>
+
+    <nav class="sidebar" role="navigation" aria-label="Sidebar navigation">
+        <a href="wireframe-SCR-006-patient-dashboard.html" class="nav-item active" aria-current="page"><span
+                class="nav-icon">📊</span> Dashboard</a>
+        <a href="wireframe-SCR-004-provider-search.html" class="nav-item"><span class="nav-icon">🔍</span> Book
+            Appointment</a>
+        <a href="wireframe-SCR-010-ai-intake.html" class="nav-item"><span class="nav-icon">📋</span> Intake</a>
+        <a href="wireframe-SCR-014-document-upload.html" class="nav-item"><span class="nav-icon">📄</span> Documents</a>
+        <a href="wireframe-SCR-016-360-degree-view.html" class="nav-item"><span class="nav-icon">❤️</span> Health
+            Profile</a>
+        <a href="wireframe-SCR-007-waitlist-status.html" class="nav-item"><span class="nav-icon">⏳</span> Waitlist</a>
+    </nav>
+
+    <main class="main-content" role="main">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Welcome back, Jane</h1>
+                <p class="page-subtitle">Here's an overview of your health activity.</p>
+            </div>
+            <a href="wireframe-SCR-004-provider-search.html" class="btn btn-primary">+ Book Appointment</a>
+        </div>
+
+        <!-- SUMMARY CARDS -->
+        <div class="summary-grid">
+            <div class="summary-card" role="article">
+                <div class="summary-icon" aria-hidden="true">📅</div>
+                <div class="summary-value">2</div>
+                <div class="summary-label">Upcoming Appointments</div>
+            </div>
+            <div class="summary-card" role="article">
+                <div class="summary-icon" aria-hidden="true">📋</div>
+                <div class="summary-value"><span class="badge badge-warning">Pending</span></div>
+                <div class="summary-label">Intake Status</div>
+            </div>
+            <div class="summary-card" role="article">
+                <div class="summary-icon" aria-hidden="true">📄</div>
+                <div class="summary-value">5</div>
+                <div class="summary-label">Documents Uploaded</div>
+            </div>
+            <div class="summary-card" role="article">
+                <div class="summary-icon" aria-hidden="true">⏳</div>
+                <div class="summary-value">1</div>
+                <div class="summary-label">Waitlist Entries</div>
+            </div>
+        </div>
+
+        <!-- APPOINTMENTS TABLE -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Appointments</h2>
+            </div>
+            <div class="tabs" role="tablist" aria-label="Appointment tabs">
+                <button class="tab-btn active" role="tab" aria-selected="true"
+                    aria-controls="tab-upcoming">Upcoming</button>
+                <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-past">Past</button>
+            </div>
+            <div id="tab-upcoming" role="tabpanel">
+                <table class="data-table" role="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Provider</th>
+                            <th scope="col">Specialty</th>
+                            <th scope="col">Date & Time</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Dr. Sarah Mitchell</td>
+                            <td>Primary Care</td>
+                            <td>Dec 19, 2025 · 10:30 AM</td>
+                            <td><span class="badge badge-success">Confirmed</span></td>
+                            <td>
+                                <a href="wireframe-SCR-008-reschedule-cancel.html"
+                                    class="btn btn-ghost btn-sm">Reschedule</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Dr. Robert Johnson</td>
+                            <td>Cardiology</td>
+                            <td>Dec 28, 2025 · 2:00 PM</td>
+                            <td><span class="badge badge-info">Pending</span></td>
+                            <td>
+                                <a href="wireframe-SCR-008-reschedule-cancel.html"
+                                    class="btn btn-ghost btn-sm">Reschedule</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Quick Actions</h2>
+            </div>
+            <div class="quick-actions">
+                <a href="wireframe-SCR-010-ai-intake.html" class="action-card" aria-label="Start AI-assisted intake">
+                    <div class="action-icon" aria-hidden="true">🤖</div>
+                    <div class="action-label">Complete Intake</div>
+                    <div class="action-desc">AI-assisted or manual entry</div>
+                </a>
+                <a href="wireframe-SCR-014-document-upload.html" class="action-card"
+                    aria-label="Upload clinical documents">
+                    <div class="action-icon" aria-hidden="true">📤</div>
+                    <div class="action-label">Upload Documents</div>
+                    <div class="action-desc">Upload clinical records</div>
+                </a>
+                <a href="wireframe-SCR-016-360-degree-view.html" class="action-card"
+                    aria-label="View your health profile">
+                    <div class="action-icon" aria-hidden="true">🏥</div>
+                    <div class="action-label">Health Profile</div>
+                    <div class="action-desc">View your 360° health data</div>
+                </a>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

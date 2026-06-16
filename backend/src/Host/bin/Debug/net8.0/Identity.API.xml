@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Identity.API</name>
+    </assembly>
+    <members>
+        <member name="T:Identity.API.Controllers.AdminUsersController">
+            <summary>
+            Admin-only user management endpoints for CRUD operations and role assignment.
+            </summary>
+        </member>
+        <member name="M:Identity.API.Controllers.AdminUsersController.GetUsers(System.Int32,System.Int32,System.String,System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Returns a paginated list of users with optional search and filters.
+            </summary>
+        </member>
+        <member name="M:Identity.API.Controllers.AdminUsersController.CreateUser(Identity.API.Controllers.CreateUserRequest,System.Threading.CancellationToken)">
+            <summary>
+            Creates a new user with the specified role.
+            </summary>
+        </member>
+        <member name="M:Identity.API.Controllers.AdminUsersController.UpdateUser(System.Guid,Identity.API.Controllers.UpdateUserRequest,System.Threading.CancellationToken)">
+            <summary>
+            Updates an existing user's details and role.
+            </summary>
+        </member>
+        <member name="M:Identity.API.Controllers.AdminUsersController.DeactivateUser(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Deactivates a user account. Admins cannot deactivate their own account.
+            </summary>
+        </member>
+        <member name="M:Identity.API.Controllers.AdminUsersController.ReactivateUser(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Reactivates a previously deactivated user account.
+            </summary>
+        </member>
+        <member name="T:Identity.API.Controllers.AuthController">
+            <summary>
+            Authentication endpoints for patient registration, login, and token management.
+            </summary>
+        </member>
+        <member name="M:Identity.API.Controllers.AuthController.Register(Identity.API.Controllers.RegisterRequest,System.Threading.CancellationToken)">
+            <summary>
+            Registers a new patient user account.
+            </summary>
+            <param name="request">Registration details including name, email, DOB, phone, and password.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>201 Created with user ID on success.</returns>
+            <response code="201">User account created successfully.</response>
+            <response code="400">Validation failed — malformed or missing fields.</response>
+            <response code="409">Email address already registered.</response>
+            <response code="503">Service temporarily unavailable — retry later.</response>
+        </member>
+        <member name="M:Identity.API.Controllers.AuthController.Login(Identity.API.Controllers.LoginRequest,System.Threading.CancellationToken)">
+            <summary>
+            Authenticates a user and returns JWT access token + refresh token.
+            </summary>
+            <param name="request">Email and password credentials.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>JWT access token and user info on success.</returns>
+            <response code="200">Authentication successful.</response>
+            <response code="401">Invalid credentials.</response>
+            <response code="423">Account locked.</response>
+            <response code="503">Service temporarily unavailable.</response>
+        </member>
+        <member name="M:Identity.API.Controllers.AuthController.Refresh(System.Threading.CancellationToken)">
+            <summary>
+            Refreshes an access token using a valid refresh token from httpOnly cookie.
+            </summary>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>New JWT access token and rotated refresh token.</returns>
+            <response code="200">Token refreshed successfully.</response>
+            <response code="401">Invalid or expired refresh token.</response>
+        </member>
+        <member name="M:Identity.API.Controllers.AuthController.ExtendSession(System.Threading.CancellationToken)">
+            <summary>
+            Extends the current session by validating the refresh token and issuing new tokens.
+            </summary>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>New JWT access token and rotated refresh token.</returns>
+            <response code="200">Session extended successfully.</response>
+            <response code="401">Invalid, expired, or reused refresh token.</response>
+            <response code="503">Service temporarily unavailable.</response>
+        </member>
+        <member name="M:Identity.API.Controllers.AuthController.Logout(System.Threading.CancellationToken)">
+            <summary>
+            Logs out the current user, invalidating all tokens and sessions.
+            </summary>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>204 No Content on success.</returns>
+            <response code="204">Logout successful.</response>
+            <response code="401">Not authenticated.</response>
+            <response code="503">Service temporarily unavailable.</response>
+        </member>
+        <member name="T:Identity.API.Controllers.RegisterRequest">
+            <summary>Registration request DTO.</summary>
+        </member>
+        <member name="M:Identity.API.Controllers.RegisterRequest.#ctor(System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>Registration request DTO.</summary>
+        </member>
+        <member name="T:Identity.API.Controllers.RegisterResponse">
+            <summary>Registration success response.</summary>
+        </member>
+        <member name="M:Identity.API.Controllers.RegisterResponse.#ctor(System.Guid)">
+            <summary>Registration success response.</summary>
+        </member>
+        <member name="T:Identity.API.Controllers.LoginRequest">
+            <summary>Login request DTO.</summary>
+        </member>
+        <member name="M:Identity.API.Controllers.LoginRequest.#ctor(System.String,System.String)">
+            <summary>Login request DTO.</summary>
+        </member>
+        <member name="T:Identity.API.Controllers.LoginResponse">
+            <summary>Login success response (access token in body, refresh token in httpOnly cookie).</summary>
+        </member>
+        <member name="M:Identity.API.Controllers.LoginResponse.#ctor(System.String,System.Guid,System.String,System.String)">
+            <summary>Login success response (access token in body, refresh token in httpOnly cookie).</summary>
+        </member>
+        <member name="T:Identity.API.Controllers.LoginErrorResponse">
+            <summary>Login error response with optional remaining attempts info.</summary>
+        </member>
+        <member name="M:Identity.API.Controllers.LoginErrorResponse.#ctor(System.String,System.Nullable{System.Int32})">
+            <summary>Login error response with optional remaining attempts info.</summary>
+        </member>
+        <member name="T:Identity.API.Controllers.RefreshResponse">
+            <summary>Refresh token response.</summary>
+        </member>
+        <member name="M:Identity.API.Controllers.RefreshResponse.#ctor(System.String)">
+            <summary>Refresh token response.</summary>
+        </member>
+        <member name="T:Identity.API.Controllers.ErrorResponse">
+            <summary>Error response envelope.</summary>
+        </member>
+        <member name="M:Identity.API.Controllers.ErrorResponse.#ctor(System.String)">
+            <summary>Error response envelope.</summary>
+        </member>
+        <member name="T:Identity.API.Controllers.IdentityController">
+            <summary>
+            Identity module endpoints for authentication, authorization, and user management.
+            </summary>
+        </member>
+        <member name="M:Identity.API.Controllers.IdentityController.GetStatus">
+            <summary>
+            Returns the current status of the Identity module.
+            </summary>
+            <returns>Module name and operational status.</returns>
+            <response code="200">Module is active and operational.</response>
+        </member>
+        <member name="T:Identity.API.Controllers.ModuleStatusResponse">
+            <summary>Module status response.</summary>
+            <param name="Module">Module name.</param>
+            <param name="Status">Operational status.</param>
+        </member>
+        <member name="M:Identity.API.Controllers.ModuleStatusResponse.#ctor(System.String,System.String)">
+            <summary>Module status response.</summary>
+            <param name="Module">Module name.</param>
+            <param name="Status">Operational status.</param>
+        </member>
+        <member name="P:Identity.API.Controllers.ModuleStatusResponse.Module">
+            <summary>Module name.</summary>
+        </member>
+        <member name="P:Identity.API.Controllers.ModuleStatusResponse.Status">
+            <summary>Operational status.</summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,249 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [develop, main, 'feature/**']
+  pull_request:
+    branches: [develop, main]
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  NODE_VERSION: '20.x'
+  SOLUTION_PATH: 'src/Backend'
+  FRONTEND_PATH: 'src/Frontend'
+
+jobs:
+  # CICD-001: Build .NET backend
+  build-backend:
+    name: Build Backend (.NET 8)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: ${{ env.SOLUTION_PATH }}
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+        working-directory: ${{ env.SOLUTION_PATH }}
+
+      # CICD-004: Build metadata
+      - name: Publish
+        run: |
+          dotnet publish --configuration Release --no-build \
+            --output ./publish \
+            /p:Version=${{ github.run_number }} \
+            /p:InformationalVersion=${{ github.sha }}
+        working-directory: ${{ env.SOLUTION_PATH }}
+
+      - name: Upload backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-artifact
+          path: ${{ env.SOLUTION_PATH }}/publish/
+          retention-days: 7
+
+  # CICD-002: Build React frontend
+  build-frontend:
+    name: Build Frontend (React)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.FRONTEND_PATH }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ${{ env.FRONTEND_PATH }}
+
+      - name: Build
+        run: npm run build
+        working-directory: ${{ env.FRONTEND_PATH }}
+
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-artifact
+          path: ${{ env.FRONTEND_PATH }}/dist/
+          retention-days: 7
+
+  # CICD-010/011: Linting
+  lint:
+    name: Code Quality - Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.FRONTEND_PATH }}/package-lock.json
+
+      # CICD-011: Backend lint
+      - name: Dotnet Format Check
+        run: dotnet format --verify-no-changes --severity warn
+        working-directory: ${{ env.SOLUTION_PATH }}
+
+      # CICD-010: Frontend lint
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: ${{ env.FRONTEND_PATH }}
+
+      - name: ESLint
+        run: npm run lint
+        working-directory: ${{ env.FRONTEND_PATH }}
+
+  # CICD-030: Unit tests with coverage
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: [build-backend]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Run unit tests with coverage
+        run: |
+          dotnet test --configuration Release \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./TestResults \
+            --logger "junit;LogFileName=test-results.xml" \
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
+        working-directory: ${{ env.SOLUTION_PATH }}
+
+      # CICD-012: Coverage threshold enforcement
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          directory: ${{ env.SOLUTION_PATH }}/TestResults
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      # CICD-034: Test reports
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unit-test-results
+          path: ${{ env.SOLUTION_PATH }}/TestResults/
+
+  # CICD-035: EF Migration validation
+  migration-check:
+    name: EF Migration Validation
+    runs-on: ubuntu-latest
+    needs: [build-backend]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install EF Core tools
+        run: dotnet tool install --global dotnet-ef
+
+      - name: Validate migrations (idempotent script)
+        run: dotnet ef migrations script --idempotent --output migrations.sql --project src/Infrastructure --startup-project src/API
+        working-directory: ${{ env.SOLUTION_PATH }}
+
+      - name: Upload migration script
+        uses: actions/upload-artifact@v4
+        with:
+          name: migration-script
+          path: ${{ env.SOLUTION_PATH }}/migrations.sql
+
+  # CICD-006: Docker image build
+  docker-build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: [build-backend]
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ env.SOLUTION_PATH }}
+          push: false
+          tags: |
+            upaci-backend:${{ github.sha }}
+            upaci-backend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          outputs: type=docker,dest=/tmp/image.tar
+
+      - name: Upload Docker image
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: /tmp/image.tar
+          retention-days: 3
+
+  # CICD-026: PHI pattern scan — HIPAA compliance
+  phi-scan:
+    name: PHI Pattern Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan for PHI patterns in source code
+        run: |
+          echo "Scanning for PHI patterns (SSN, DOB, MRN)..."
+          FOUND=0
+
+          # SSN pattern (XXX-XX-XXXX)
+          if grep -rnP '\b\d{3}-\d{2}-\d{4}\b' --include='*.cs' --include='*.ts' --include='*.tsx' --include='*.json' --include='*.yml' src/ || false; then
+            echo "::error::SSN pattern detected in source code"
+            FOUND=1
+          fi
+
+          # Hardcoded date of birth patterns
+          if grep -rnPi '(date.?of.?birth|dob)\s*[:=]\s*["'\'']\d{4}' --include='*.cs' --include='*.ts' --include='*.json' src/ || false; then
+            echo "::error::Hardcoded DOB detected in source code"
+            FOUND=1
+          fi
+
+          if [ "$FOUND" -eq 1 ]; then
+            echo "::error::PHI patterns detected. Remove all PHI from source code."
+            exit 1
+          fi
+          echo "No PHI patterns detected."

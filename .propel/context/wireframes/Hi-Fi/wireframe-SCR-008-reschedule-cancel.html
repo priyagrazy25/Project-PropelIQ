@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<!--
+  WIREFRAME: SCR-008 Reschedule/Cancel
+  FIDELITY: High | VIEWPORT: 1440x900
+  FLOW: FL-002 (from dashboard appointment row)
+  NAV-LINKS: SCR-006: wireframe-SCR-006-patient-dashboard.html
+  UXR: UXR-107 (Reschedule ≤3 clicks), UXR-108 (Cancel confirmation)
+  COMPONENTS: Card(1), Select(1), DatePicker(1), Button(2), Dialog(OVL-005), Sidebar, Header
+-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCR-008 Reschedule/Cancel | Unified Patient Access</title>
+    <style>
+        :root {
+            --color-primary: #1E6F9F;
+            --color-primary-hover: #175F87;
+            --color-secondary: #2D9F83;
+            --color-danger: #D32F2F;
+            --color-text-primary: #111827;
+            --color-text-secondary: #374151;
+            --color-text-muted: #6B7280;
+            --color-border: #D1D5DB;
+            --color-surface: #FFF;
+            --color-bg: #F9FAFB;
+            --color-gray-100: #F3F4F6;
+            --surface-info: #E8F4FD;
+            --surface-danger: #FDECEC;
+            --surface-hover: #F3F4F6;
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-full: 9999px;
+            --shadow-1: 0 1px 3px rgba(0, 0, 0, .1);
+            --shadow-3: 0 10px 15px rgba(0, 0, 0, .1);
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --duration-fast: 150ms;
+            --duration-normal: 200ms;
+            --easing-default: cubic-bezier(.4, 0, .2, 1);
+            --header-height: 64px;
+            --sidebar-width: 256px
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: var(--font-primary);
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--color-text-primary);
+            background: var(--color-bg)
+        }
+
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--space-6);
+            z-index: 100;
+            box-shadow: var(--shadow-1)
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2)
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--color-primary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 18px
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            background: var(--color-primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .sidebar {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--color-surface);
+            border-right: 1px solid var(--color-border);
+            padding: var(--space-4) 0;
+            z-index: 90
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-6);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: background var(--duration-fast) var(--easing-default)
+        }
+
+        .nav-item:hover {
+            background: var(--surface-hover)
+        }
+
+        .nav-item.active {
+            color: var(--color-primary);
+            background: var(--surface-info);
+            border-left-color: var(--color-primary);
+            font-weight: 600
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: var(--space-8);
+            max-width: 700px
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: 14px;
+            margin-bottom: var(--space-6)
+        }
+
+        .breadcrumb a {
+            color: var(--color-primary);
+            text-decoration: none
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline
+        }
+
+        .breadcrumb span {
+            color: var(--color-text-muted)
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: var(--space-6)
+        }
+
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-6);
+            box-shadow: var(--shadow-1);
+            margin-bottom: var(--space-6)
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: var(--space-5)
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-2) 0;
+            border-bottom: 1px solid var(--color-gray-100)
+        }
+
+        .detail-label {
+            font-size: 14px;
+            color: var(--color-text-muted)
+        }
+
+        .detail-value {
+            font-size: 14px;
+            font-weight: 500
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+            margin-bottom: var(--space-5)
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-secondary)
+        }
+
+        .form-input {
+            height: 40px;
+            padding: 0 var(--space-3);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: 16px;
+            color: var(--color-text-primary)
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(30, 111, 159, .15)
+        }
+
+        .action-bar {
+            display: flex;
+            gap: var(--space-3);
+            align-items: center
+        }
+
+        .btn {
+            height: 40px;
+            padding: 0 var(--space-4);
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background var(--duration-fast) var(--easing-default)
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: #fff
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover)
+        }
+
+        .btn-danger {
+            background: var(--color-danger);
+            color: #fff
+        }
+
+        .btn-danger:hover {
+            background: #B71C1C
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--color-text-muted)
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface-hover);
+            color: var(--color-text-primary)
+        }
+
+        /* OVL-005 Dialog */
+        .dialog-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center
+        }
+
+        .dialog-backdrop.open {
+            display: flex
+        }
+
+        .dialog {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-3);
+            max-width: 400px;
+            width: 90%;
+            padding: var(--space-6)
+        }
+
+        .dialog-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: var(--space-3)
+        }
+
+        .dialog-msg {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-6)
+        }
+
+        .dialog-actions {
+            display: flex;
+            gap: var(--space-3);
+            justify-content: flex-end
+        }
+
+        @media(max-width:768px) {
+            .sidebar {
+                display: none
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="app-header" role="banner"><a href="wireframe-SCR-006-patient-dashboard.html" class="logo"><span
+                class="logo-icon" aria-hidden="true">+</span> Unified Patient Access</a>
+        <div><span class="avatar" role="button" tabindex="0" aria-label="User menu">JD</span></div>
+    </header>
+    <nav class="sidebar" role="navigation" aria-label="Sidebar navigation">
+        <a href="wireframe-SCR-006-patient-dashboard.html" class="nav-item active"><span class="nav-icon">📊</span>
+            Dashboard</a>
+        <a href="wireframe-SCR-004-provider-search.html" class="nav-item"><span class="nav-icon">🔍</span> Book
+            Appointment</a>
+        <a href="wireframe-SCR-010-ai-intake.html" class="nav-item"><span class="nav-icon">📋</span> Intake</a>
+        <a href="wireframe-SCR-014-document-upload.html" class="nav-item"><span class="nav-icon">📄</span> Documents</a>
+        <a href="wireframe-SCR-016-360-degree-view.html" class="nav-item"><span class="nav-icon">❤️</span> Health
+            Profile</a>
+        <a href="wireframe-SCR-007-waitlist-status.html" class="nav-item"><span class="nav-icon">⏳</span> Waitlist</a>
+    </nav>
+    <main class="main-content" role="main">
+        <nav class="breadcrumb" aria-label="Breadcrumb"><a
+                href="wireframe-SCR-006-patient-dashboard.html">Dashboard</a><span aria-hidden="true">›</span><span
+                aria-current="page">Reschedule / Cancel</span></nav>
+        <h1 class="page-title">Manage Appointment</h1>
+        <div class="card">
+            <div class="card-title">Current Appointment</div>
+            <div class="detail-row"><span class="detail-label">Provider</span><span class="detail-value">Dr. Sarah
+                    Mitchell</span></div>
+            <div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">December 19,
+                    2025</span></div>
+            <div class="detail-row"><span class="detail-label">Time</span><span class="detail-value">10:30 AM – 11:00
+                    AM</span></div>
+            <div class="detail-row"><span class="detail-label">Location</span><span class="detail-value">Downtown
+                    Clinic, Suite 200</span></div>
+        </div>
+        <div class="card">
+            <div class="card-title">Reschedule</div>
+            <div class="form-group">
+                <label class="form-label" for="new-date">New Date</label>
+                <input type="date" id="new-date" class="form-input" aria-label="Select new appointment date">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="new-time">New Time Slot</label>
+                <select id="new-time" class="form-input">
+                    <option value="">Select available time</option>
+                    <option>9:00 AM</option>
+                    <option>11:00 AM</option>
+                    <option>2:00 PM</option>
+                    <option>3:30 PM</option>
+                </select>
+            </div>
+            <div class="action-bar">
+                <button class="btn btn-primary">Confirm Reschedule</button>
+                <button class="btn btn-danger" id="cancel-btn" aria-label="Cancel appointment">Cancel
+                    Appointment</button>
+                <a href="wireframe-SCR-006-patient-dashboard.html" class="btn btn-ghost">Back</a>
+            </div>
+        </div>
+    </main>
+    <!-- OVL-005 Cancel Confirmation Dialog -->
+    <div class="dialog-backdrop" id="cancel-dialog" role="alertdialog" aria-modal="true" aria-labelledby="dlg-title"
+        aria-describedby="dlg-msg">
+        <div class="dialog">
+            <h2 class="dialog-title" id="dlg-title">Cancel Appointment?</h2>
+            <p class="dialog-msg" id="dlg-msg">This will cancel your appointment with Dr. Sarah Mitchell on Dec 19. This
+                action cannot be undone. You may need to rebook.</p>
+            <div class="dialog-actions">
+                <button class="btn btn-ghost">Keep Appointment</button>
+                <button class="btn btn-danger">Yes, Cancel</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

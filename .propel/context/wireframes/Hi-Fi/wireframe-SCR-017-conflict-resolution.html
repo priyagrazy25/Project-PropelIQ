@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<!--
+  WIREFRAME: SCR-017 Conflict Resolution
+  FIDELITY: High | VIEWPORT: 1440x900
+  FLOW: FL-005 360-View & Conflict Resolution
+  NAV-LINKS: SCR-016: wireframe-SCR-016-360-degree-view.html
+  UXR: UXR-503 (Side-by-side comparison), UXR-504 (Clear resolution workflow)
+  COMPONENTS: Card(2 panels), RadioGroup(1), TextArea(1), Button(2), Badge(1), Sidebar, Header
+-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCR-017 Conflict Resolution | Unified Patient Access</title>
+    <style>
+        :root {
+            --color-primary: #1E6F9F;
+            --color-primary-hover: #175F87;
+            --color-secondary: #2D9F83;
+            --color-danger: #D32F2F;
+            --color-warning: #EF6C00;
+            --color-text-primary: #111827;
+            --color-text-secondary: #374151;
+            --color-text-muted: #6B7280;
+            --color-border: #D1D5DB;
+            --color-surface: #FFF;
+            --color-bg: #F9FAFB;
+            --color-gray-100: #F3F4F6;
+            --surface-info: #E8F4FD;
+            --surface-warning: #FFF3E0;
+            --surface-hover: #F3F4F6;
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-full: 9999px;
+            --shadow-1: 0 1px 3px rgba(0, 0, 0, .1);
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --duration-fast: 150ms;
+            --easing-default: cubic-bezier(.4, 0, .2, 1);
+            --header-height: 64px;
+            --sidebar-width: 256px
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: var(--font-primary);
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--color-text-primary);
+            background: var(--color-bg)
+        }
+
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--space-6);
+            z-index: 100;
+            box-shadow: var(--shadow-1)
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2)
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--color-primary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 18px
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            background: var(--color-primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .sidebar {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--color-surface);
+            border-right: 1px solid var(--color-border);
+            padding: var(--space-4) 0;
+            z-index: 90
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-6);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: background var(--duration-fast) var(--easing-default)
+        }
+
+        .nav-item:hover {
+            background: var(--surface-hover)
+        }
+
+        .nav-item.active {
+            color: var(--color-primary);
+            background: var(--surface-info);
+            border-left-color: var(--color-primary);
+            font-weight: 600
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: var(--space-8)
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: 14px;
+            margin-bottom: var(--space-6)
+        }
+
+        .breadcrumb a {
+            color: var(--color-primary);
+            text-decoration: none
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline
+        }
+
+        .breadcrumb span {
+            color: var(--color-text-muted)
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: var(--space-2)
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-8)
+        }
+
+        /* COMPARISON PANELS */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-6);
+            margin-bottom: var(--space-6)
+        }
+
+        .panel {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-5);
+            box-shadow: var(--shadow-1)
+        }
+
+        .panel.selected {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(30, 111, 159, .15)
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-4);
+            padding-bottom: var(--space-3);
+            border-bottom: 1px solid var(--color-gray-100)
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 600
+        }
+
+        .panel-source {
+            font-size: 12px;
+            color: var(--color-text-muted)
+        }
+
+        .field-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-2) 0;
+            font-size: 14px
+        }
+
+        .field-label {
+            color: var(--color-text-muted)
+        }
+
+        .field-value {
+            font-weight: 500
+        }
+
+        .field-value.conflict {
+            color: var(--color-danger);
+            text-decoration: underline wavy var(--color-danger)
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px var(--space-2);
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 500
+        }
+
+        .badge-warning {
+            background: var(--surface-warning);
+            color: var(--color-warning)
+        }
+
+        /* RESOLUTION FORM */
+        .resolution-form {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-6);
+            box-shadow: var(--shadow-1);
+            margin-bottom: var(--space-6)
+        }
+
+        .form-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: var(--space-5)
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+            margin-bottom: var(--space-5)
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-4);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--duration-fast) var(--easing-default)
+        }
+
+        .radio-option:hover {
+            border-color: var(--color-primary);
+            background: var(--surface-info)
+        }
+
+        .radio-option input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--color-primary)
+        }
+
+        .radio-option label {
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+            margin-bottom: var(--space-5)
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-secondary)
+        }
+
+        .form-textarea {
+            min-height: 80px;
+            padding: var(--space-3);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: 14px;
+            resize: vertical
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(30, 111, 159, .15)
+        }
+
+        .action-bar {
+            display: flex;
+            gap: var(--space-3)
+        }
+
+        .btn {
+            height: 40px;
+            padding: 0 var(--space-4);
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: background var(--duration-fast) var(--easing-default)
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: #fff
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover)
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--color-text-muted)
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface-hover)
+        }
+
+        @media(max-width:768px) {
+            .sidebar {
+                display: none
+            }
+
+            .main-content {
+                margin-left: 0
+            }
+
+            .comparison {
+                grid-template-columns: 1fr
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="app-header" role="banner"><a href="wireframe-SCR-006-patient-dashboard.html" class="logo"><span
+                class="logo-icon" aria-hidden="true">+</span> Unified Patient Access</a>
+        <div><span class="avatar" role="button" tabindex="0" aria-label="User menu">JD</span></div>
+    </header>
+    <nav class="sidebar" role="navigation" aria-label="Sidebar navigation"><a
+            href="wireframe-SCR-006-patient-dashboard.html" class="nav-item"><span class="nav-icon">📊</span>
+            Dashboard</a><a href="wireframe-SCR-004-provider-search.html" class="nav-item"><span
+                class="nav-icon">🔍</span> Book Appointment</a><a href="wireframe-SCR-010-ai-intake.html"
+            class="nav-item"><span class="nav-icon">📋</span> Intake</a><a href="wireframe-SCR-014-document-upload.html"
+            class="nav-item"><span class="nav-icon">📄</span> Documents</a><a
+            href="wireframe-SCR-016-360-degree-view.html" class="nav-item active"><span class="nav-icon">❤️</span>
+            Health Profile</a><a href="wireframe-SCR-007-waitlist-status.html" class="nav-item"><span
+                class="nav-icon">⏳</span> Waitlist</a></nav>
+    <main class="main-content" role="main">
+        <nav class="breadcrumb" aria-label="Breadcrumb"><a
+                href="wireframe-SCR-006-patient-dashboard.html">Dashboard</a><span aria-hidden="true">›</span><a
+                href="wireframe-SCR-016-360-degree-view.html">Health Profile</a><span aria-hidden="true">›</span><span
+                aria-current="page">Resolve Conflict</span></nav>
+        <h1 class="page-title">Resolve Data Conflict</h1>
+        <p class="page-subtitle">The same field has different values from two sources. Select the correct value.</p>
+        <!-- SIDE-BY-SIDE COMPARISON -->
+        <div class="comparison">
+            <div class="panel selected">
+                <div class="panel-header"><span class="panel-title">Source A: AI Intake</span><span
+                        class="panel-source">Collected Dec 15, 2025</span></div>
+                <div class="field-row"><span class="field-label">Field</span><span class="field-value">Address</span>
+                </div>
+                <div class="field-row"><span class="field-label">Value</span><span class="field-value">123 Main St,
+                        Springfield, IL 62701</span></div>
+                <div class="field-row"><span class="field-label">Confidence</span><span class="field-value"
+                        style="color:var(--color-secondary)">94%</span></div>
+            </div>
+            <div class="panel">
+                <div class="panel-header"><span class="panel-title">Source B: Insurance Card OCR</span><span
+                        class="panel-source">Extracted Dec 16, 2025</span></div>
+                <div class="field-row"><span class="field-label">Field</span><span class="field-value">Address</span>
+                </div>
+                <div class="field-row"><span class="field-label">Value</span><span class="field-value conflict">456 Oak
+                        Ave, Springfield, IL 62702</span></div>
+                <div class="field-row"><span class="field-label">Confidence</span><span class="field-value"
+                        style="color:var(--color-warning)">78%</span></div>
+            </div>
+        </div>
+        <!-- RESOLUTION -->
+        <div class="resolution-form">
+            <div class="form-title">Select Resolution</div>
+            <div class="radio-group" role="radiogroup" aria-label="Choose correct value">
+                <div class="radio-option"><input type="radio" name="resolution" id="res-a" checked><label
+                        for="res-a">Use Source A: <strong>123 Main St, Springfield, IL 62701</strong> (94%
+                        confidence)</label></div>
+                <div class="radio-option"><input type="radio" name="resolution" id="res-b"><label for="res-b">Use Source
+                        B: <strong>456 Oak Ave, Springfield, IL 62702</strong> (78% confidence)</label></div>
+                <div class="radio-option"><input type="radio" name="resolution" id="res-manual"><label
+                        for="res-manual">Enter manually</label></div>
+            </div>
+            <div class="form-group"><label class="form-label" for="resolution-notes">Resolution Notes
+                    (optional)</label><textarea id="resolution-notes" class="form-textarea"
+                    placeholder="Add context for this resolution decision..."></textarea></div>
+            <div class="action-bar">
+                <button class="btn btn-primary">Save Resolution</button>
+                <a href="wireframe-SCR-016-360-degree-view.html" class="btn btn-ghost">Cancel</a>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

@@ -1,0 +1,282 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Host</name>
+    </assembly>
+    <members>
+        <member name="T:Host.Controllers.AuditLogsController">
+            <summary>
+            API controller for SCR-025 Audit Log Viewer.
+            Provides read-only access to audit records for administrators.
+            </summary>
+        </member>
+        <member name="M:Host.Controllers.AuditLogsController.GetAuditLogs(System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.String,System.String,System.String,System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            GET /api/auditlogs
+            Returns paginated audit log records with optional filtering.
+            </summary>
+        </member>
+        <member name="M:Host.Controllers.AuditLogsController.GetAiAuditLogs(System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.String,System.String,System.Nullable{System.Boolean},System.Int32,System.Int32)">
+            <summary>
+            GET /api/auditlogs/ai
+            Returns paginated AI invocation audit records.
+            </summary>
+        </member>
+        <member name="M:Host.Controllers.AuditLogsController.ExportAuditLogs(System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.String,System.String,System.String)">
+            <summary>
+            GET /api/auditlogs/export
+            Exports filtered audit logs as CSV for compliance reporting.
+            </summary>
+        </member>
+        <member name="M:Host.Controllers.AuditLogsController.GetAuditStats(System.Nullable{System.DateTime},System.Nullable{System.DateTime})">
+            <summary>
+            GET /api/auditlogs/stats
+            Returns audit statistics for dashboard display.
+            </summary>
+        </member>
+        <member name="T:Host.Controllers.AiAuditLogFilter">
+            <summary>
+            Filter for AI audit log queries.
+            </summary>
+        </member>
+        <member name="T:Host.Controllers.AuditStatsResponse">
+            <summary>
+            Response containing audit statistics.
+            </summary>
+        </member>
+        <member name="T:Host.Controllers.TimeRangeInfo">
+            <summary>
+            Time range information for stats.
+            </summary>
+        </member>
+        <member name="T:Host.Controllers.CalendarSyncTriggerController">
+            <summary>
+            Triggers calendar sync for an appointment after OAuth tokens have been stored.
+            Lives in Host because it bridges Scheduling and Notification modules.
+            Uses the fresh OAuth token from the request to create the calendar event directly,
+            bypassing the DB token lookup chain which can silently fail.
+            </summary>
+        </member>
+        <member name="M:Host.Controllers.CalendarSyncTriggerController.SyncAppointment(Host.Controllers.CalendarSyncTriggerController.SyncRequest,System.Threading.CancellationToken)">
+            <summary>
+            Creates a calendar event for an appointment using the fresh OAuth token
+            obtained from the frontend OAuth callback.
+            </summary>
+        </member>
+        <member name="T:Host.HealthChecks.BackupHealthCheck">
+            <summary>
+            Health check verifying database backup recency and integrity per DR-014, DR-015.
+            Returns Degraded if backup age exceeds 4 hours, Unhealthy if exceeds 24 hours (RPO).
+            Also verifies backup certificate validity and file existence.
+            </summary>
+        </member>
+        <member name="T:Host.HealthChecks.DatabaseHealthCheck">
+            <summary>
+            Health check that verifies SQL Server database connectivity for all module schemas.
+            Returns Degraded (not Unhealthy) on timeout per edge case spec.
+            </summary>
+        </member>
+        <member name="T:Host.HealthChecks.EncryptionHealthCheck">
+            <summary>
+            Health check that verifies encryption infrastructure is properly configured (NFR-005, NFR-006).
+            
+            Checks:
+            1. SQL Server TDE is active (or Always Encrypted is available)
+            2. File encryption keys are loaded and valid
+            3. TLS 1.2+ is enforced for database connections
+            </summary>
+        </member>
+        <member name="T:Host.HealthChecks.OllamaHealthCheck">
+            <summary>
+            Health check that verifies Ollama AI runtime connectivity by calling /api/tags.
+            Returns Degraded (not Unhealthy) on timeout per edge case spec.
+            </summary>
+        </member>
+        <member name="T:Host.Hubs.AppointmentHub">
+            <summary>
+            SignalR hub for real-time appointment slot availability and queue status updates (AD-008, NFR-002).
+            Clients join provider-specific or queue groups to receive targeted broadcasts within 500ms.
+            </summary>
+        </member>
+        <member name="P:Host.Hubs.AppointmentHub.ConnectionCount">
+            <summary>Current number of active SignalR connections for monitoring (AC-5).</summary>
+        </member>
+        <member name="M:Host.Hubs.AppointmentHub.JoinProviderGroup(System.String)">
+            <summary>
+            Subscribes the caller to slot updates for a specific provider.
+            </summary>
+        </member>
+        <member name="M:Host.Hubs.AppointmentHub.LeaveProviderGroup(System.String)">
+            <summary>
+            Unsubscribes the caller from a provider's slot updates.
+            </summary>
+        </member>
+        <member name="M:Host.Hubs.AppointmentHub.JoinQueueGroup">
+            <summary>
+            Subscribes the caller to same-day queue status updates.
+            </summary>
+        </member>
+        <member name="M:Host.Hubs.AppointmentHub.LeaveQueueGroup">
+            <summary>
+            Unsubscribes the caller from queue status updates.
+            </summary>
+        </member>
+        <member name="M:Host.Hubs.AppointmentHub.JoinStaffQueueGroup">
+            <summary>
+            Subscribes the caller to staff-only queue management updates (queue-status-changed events).
+            </summary>
+        </member>
+        <member name="M:Host.Hubs.AppointmentHub.LeaveStaffQueueGroup">
+            <summary>
+            Unsubscribes the caller from staff queue management updates.
+            </summary>
+        </member>
+        <member name="T:Host.Hubs.DocumentHub">
+            <summary>
+            SignalR hub for real-time document processing status updates (SCR-014).
+            Clients receive notifications when document OCR/NER processing completes.
+            </summary>
+        </member>
+        <member name="P:Host.Hubs.DocumentHub.ConnectionCount">
+            <summary>Current number of active SignalR connections for monitoring.</summary>
+        </member>
+        <member name="M:Host.Hubs.DocumentHub.JoinDocumentGroup(System.String)">
+            <summary>
+            Subscribes the caller to updates for a specific document.
+            </summary>
+        </member>
+        <member name="M:Host.Hubs.DocumentHub.LeaveDocumentGroup(System.String)">
+            <summary>
+            Unsubscribes the caller from updates for a specific document.
+            </summary>
+        </member>
+        <member name="T:Host.Hubs.RedisHealthCheck">
+            <summary>
+            Health check for Redis connectivity. Returns Degraded when Redis is unreachable (AC-4 graceful degradation).
+            </summary>
+        </member>
+        <member name="T:Host.Services.BookingConfirmationNotifier">
+            <summary>
+            Bridges the Scheduling module's booking confirmation trigger
+            to the Notification module's PDF + email service.
+            </summary>
+        </member>
+        <member name="T:Host.Services.CalendarAppointmentQueryService">
+            <summary>
+            Bridges the Notification module's calendar sync with Scheduling/Identity data.
+            Provides appointment details needed for creating external calendar events.
+            </summary>
+        </member>
+        <member name="T:Host.Services.CalendarSyncService">
+            <summary>
+            Real calendar sync implementation replacing NoOpCalendarSyncService.
+            Orchestrates Google/Outlook providers via strategy pattern.
+            Handles circuit breaker failures by logging for async retry (AC-5, NFR-014).
+            </summary>
+        </member>
+        <member name="T:Host.Services.IntakeRecordPersistenceService">
+            <summary>
+            Cross-module intake record persistence bridging Clinical and Scheduling modules.
+            Persists completed intake session data to the IntakeRecord entity in the Scheduling module.
+            </summary>
+        </member>
+        <member name="T:Host.Services.ManualIntakePersistenceService">
+            <summary>
+            Cross-module manual intake persistence bridging Clinical and Scheduling modules.
+            </summary>
+        </member>
+        <member name="T:Host.Services.MtbfTracker">
+            <summary>
+            Tracks Mean Time Between Failures (MTBF) for core scheduling operations per NFR-018.
+            Alerts when MTBF drops below 720 hours threshold.
+            </summary>
+        </member>
+        <member name="M:Host.Services.MtbfTracker.RecordSuccess(System.String)">
+            <summary>
+            Records a successful operation execution.
+            </summary>
+        </member>
+        <member name="M:Host.Services.MtbfTracker.RecordFailure(System.String,System.Exception)">
+            <summary>
+            Records an operation failure. Triggers MTBF recalculation and alerting.
+            </summary>
+        </member>
+        <member name="M:Host.Services.MtbfTracker.GetAllStats">
+            <summary>
+            Gets MTBF statistics for all tracked operations.
+            </summary>
+        </member>
+        <member name="M:Host.Services.MtbfTracker.GetStats(System.String)">
+            <summary>
+            Gets MTBF for a specific operation.
+            </summary>
+        </member>
+        <member name="M:Host.Services.MtbfTracker.OperationMetrics.GetMtbf">
+            <summary>
+            MTBF = Total operational time / Number of failures.
+            If no failures, returns time since tracking started.
+            </summary>
+        </member>
+        <member name="T:Host.Services.MtbfStats">
+            <summary>
+            MTBF statistics for a tracked operation.
+            </summary>
+        </member>
+        <member name="M:Host.Services.MtbfStats.#ctor(System.Int32,System.Int32,System.TimeSpan,System.DateTime)">
+            <summary>
+            MTBF statistics for a tracked operation.
+            </summary>
+        </member>
+        <member name="T:Host.Services.PatientDemographicsService">
+            <summary>
+            Cross-module patient demographics implementation bridging Identity and Clinical modules.
+            Used for 360-degree patient view (SCR-016).
+            </summary>
+        </member>
+        <member name="T:Host.Services.PatientLookupService">
+            <summary>
+            Cross-module patient lookup implementation bridging Identity and Scheduling modules.
+            Used for walk-in booking patient search and inline creation (AC-2, AC-3).
+            </summary>
+        </member>
+        <member name="T:Host.Services.RestoreVerificationService">
+            <summary>
+            Background service that performs weekly automated restore verification per DR-014.
+            Restores the latest backup to a verification database, validates integrity, then drops it.
+            Validates RPO 24h / RTO 4h disaster recovery capability.
+            </summary>
+        </member>
+        <member name="T:Host.Services.SlotNotificationService">
+            <summary>
+            Broadcasts slot availability changes via SignalR and invalidates search cache (AC-2, AC-5).
+            </summary>
+        </member>
+        <member name="T:Host.Services.UptimeMonitorService">
+            <summary>
+            Background service that tracks platform uptime and triggers alerts when
+            uptime drops below 99.9% threshold per NFR-012.
+            Polls health endpoints every 60 seconds and records uptime/downtime events.
+            </summary>
+        </member>
+        <member name="M:Host.Services.UptimeMonitorService.GetCurrentUptimePercent">
+            <summary>
+            Gets the current rolling 30-day uptime percentage.
+            </summary>
+        </member>
+        <member name="M:Host.Services.UptimeMonitorService.GetStats">
+            <summary>
+            Gets uptime statistics for monitoring endpoints.
+            </summary>
+        </member>
+        <member name="T:Host.Services.UptimeStats">
+            <summary>
+            Uptime statistics record for monitoring endpoints.
+            </summary>
+        </member>
+        <member name="M:Host.Services.UptimeStats.#ctor(System.Int32,System.Int32,System.Double,System.DateTime)">
+            <summary>
+            Uptime statistics record for monitoring endpoints.
+            </summary>
+        </member>
+    </members>
+</doc>

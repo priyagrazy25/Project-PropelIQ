@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<!--
+  WIREFRAME: SCR-011 Manual Intake
+  FIDELITY: High | VIEWPORT: 1440x900
+  FLOW: FL-003 Patient Intake
+  NAV-LINKS: SCR-010: wireframe-SCR-010-ai-intake.html (toggle), SCR-012: wireframe-SCR-012-intake-summary.html (submit)
+  UXR: UXR-301, UXR-302, UXR-303
+  COMPONENTS: TextField(8), Select(3), TextArea(2), Checkbox(N), Button(2), Sidebar, Header
+-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCR-011 Manual Intake | Unified Patient Access</title>
+    <style>
+        :root {
+            --color-primary: #1E6F9F;
+            --color-primary-hover: #175F87;
+            --color-secondary: #2D9F83;
+            --color-danger: #D32F2F;
+            --color-text-primary: #111827;
+            --color-text-secondary: #374151;
+            --color-text-muted: #6B7280;
+            --color-border: #D1D5DB;
+            --color-surface: #FFF;
+            --color-bg: #F9FAFB;
+            --color-gray-100: #F3F4F6;
+            --surface-info: #E8F4FD;
+            --surface-hover: #F3F4F6;
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-full: 9999px;
+            --shadow-1: 0 1px 3px rgba(0, 0, 0, .1);
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --duration-fast: 150ms;
+            --easing-default: cubic-bezier(.4, 0, .2, 1);
+            --header-height: 64px;
+            --sidebar-width: 256px
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: var(--font-primary);
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--color-text-primary);
+            background: var(--color-bg)
+        }
+
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--space-6);
+            z-index: 100;
+            box-shadow: var(--shadow-1)
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2)
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--color-primary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 18px
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            background: var(--color-primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .sidebar {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--color-surface);
+            border-right: 1px solid var(--color-border);
+            padding: var(--space-4) 0;
+            z-index: 90
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-6);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: background var(--duration-fast) var(--easing-default)
+        }
+
+        .nav-item:hover {
+            background: var(--surface-hover)
+        }
+
+        .nav-item.active {
+            color: var(--color-primary);
+            background: var(--surface-info);
+            border-left-color: var(--color-primary);
+            font-weight: 600
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: var(--space-8);
+            max-width: 800px
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: 14px;
+            margin-bottom: var(--space-6)
+        }
+
+        .breadcrumb a {
+            color: var(--color-primary);
+            text-decoration: none
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline
+        }
+
+        .breadcrumb span {
+            color: var(--color-text-muted)
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-6)
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700
+        }
+
+        .mode-link {
+            font-size: 14px;
+            color: var(--color-primary);
+            text-decoration: none;
+            font-weight: 500
+        }
+
+        .mode-link:hover {
+            text-decoration: underline
+        }
+
+        .section {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-6);
+            box-shadow: var(--shadow-1);
+            margin-bottom: var(--space-6)
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: var(--space-5);
+            padding-bottom: var(--space-3);
+            border-bottom: 1px solid var(--color-gray-100)
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-5)
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1)
+        }
+
+        .form-group.full-width {
+            grid-column: 1/-1
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-secondary)
+        }
+
+        .form-label .req {
+            color: var(--color-danger)
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            padding: var(--space-2) var(--space-3);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: 14px;
+            color: var(--color-text-primary)
+        }
+
+        .form-input,
+        .form-select {
+            height: 40px
+        }
+
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(30, 111, 159, .15)
+        }
+
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: var(--color-text-muted)
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2)
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: 14px;
+            color: var(--color-text-secondary)
+        }
+
+        .checkbox-item input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--color-primary)
+        }
+
+        .action-bar {
+            display: flex;
+            gap: var(--space-3);
+            margin-top: var(--space-8)
+        }
+
+        .btn {
+            height: 40px;
+            padding: 0 var(--space-4);
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background var(--duration-fast) var(--easing-default)
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: #fff
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover)
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--color-text-muted)
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface-hover)
+        }
+
+        .btn-lg {
+            height: 48px;
+            font-size: 16px;
+            padding: 0 var(--space-6)
+        }
+
+        @media(max-width:768px) {
+            .sidebar {
+                display: none
+            }
+
+            .main-content {
+                margin-left: 0
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="app-header" role="banner"><a href="wireframe-SCR-006-patient-dashboard.html" class="logo"><span
+                class="logo-icon" aria-hidden="true">+</span> Unified Patient Access</a>
+        <div><span class="avatar" role="button" tabindex="0" aria-label="User menu">JD</span></div>
+    </header>
+    <nav class="sidebar" role="navigation" aria-label="Sidebar navigation">
+        <a href="wireframe-SCR-006-patient-dashboard.html" class="nav-item"><span class="nav-icon">📊</span>
+            Dashboard</a>
+        <a href="wireframe-SCR-004-provider-search.html" class="nav-item"><span class="nav-icon">🔍</span> Book
+            Appointment</a>
+        <a href="wireframe-SCR-010-ai-intake.html" class="nav-item active" aria-current="page"><span
+                class="nav-icon">📋</span> Intake</a>
+        <a href="wireframe-SCR-014-document-upload.html" class="nav-item"><span class="nav-icon">📄</span> Documents</a>
+        <a href="wireframe-SCR-016-360-degree-view.html" class="nav-item"><span class="nav-icon">❤️</span> Health
+            Profile</a>
+        <a href="wireframe-SCR-007-waitlist-status.html" class="nav-item"><span class="nav-icon">⏳</span> Waitlist</a>
+    </nav>
+    <main class="main-content" role="main">
+        <nav class="breadcrumb" aria-label="Breadcrumb"><a
+                href="wireframe-SCR-006-patient-dashboard.html">Dashboard</a><span aria-hidden="true">›</span><span
+                aria-current="page">Manual Intake</span></nav>
+        <div class="page-header">
+            <h1 class="page-title">Patient Intake Form</h1><a href="wireframe-SCR-010-ai-intake.html"
+                class="mode-link">Switch to AI Assisted →</a>
+        </div>
+        <form novalidate>
+            <!-- Allergies -->
+            <div class="section">
+                <div class="section-title">Allergies</div>
+                <div class="form-grid">
+                    <div class="form-group"><label class="form-label" for="allergy-name">Allergy Name <span
+                                class="req">*</span></label><input type="text" id="allergy-name" class="form-input"
+                            placeholder="e.g., Penicillin"></div>
+                    <div class="form-group"><label class="form-label" for="allergy-type">Type</label><select
+                            id="allergy-type" class="form-select">
+                            <option value="">Select</option>
+                            <option>Medication</option>
+                            <option>Food</option>
+                            <option>Environmental</option>
+                        </select></div>
+                    <div class="form-group"><label class="form-label" for="allergy-severity">Severity <span
+                                class="req">*</span></label><select id="allergy-severity" class="form-select">
+                            <option value="">Select</option>
+                            <option>Mild</option>
+                            <option>Moderate</option>
+                            <option>Severe</option>
+                        </select></div>
+                    <div class="form-group"><label class="form-label" for="allergy-reaction">Reaction</label><input
+                            type="text" id="allergy-reaction" class="form-input" placeholder="e.g., Hives, swelling">
+                    </div>
+                </div>
+            </div>
+            <!-- Medications -->
+            <div class="section">
+                <div class="section-title">Current Medications</div>
+                <div class="form-grid">
+                    <div class="form-group"><label class="form-label" for="med-name">Medication Name <span
+                                class="req">*</span></label><input type="text" id="med-name" class="form-input"
+                            placeholder="e.g., Lisinopril"></div>
+                    <div class="form-group"><label class="form-label" for="med-dosage">Dosage</label><input type="text"
+                            id="med-dosage" class="form-input" placeholder="e.g., 10mg daily"></div>
+                    <div class="form-group full-width"><label class="form-label" for="med-notes">Notes</label><textarea
+                            id="med-notes" class="form-textarea"
+                            placeholder="Additional details about medication..."></textarea></div>
+                </div>
+            </div>
+            <!-- Medical History -->
+            <div class="section">
+                <div class="section-title">Medical History</div>
+                <div class="form-group full-width" style="margin-bottom:var(--space-4)"><label
+                        class="form-label">Conditions (select all that apply)</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox"> Diabetes</label>
+                        <label class="checkbox-item"><input type="checkbox"> Hypertension</label>
+                        <label class="checkbox-item"><input type="checkbox"> Heart Disease</label>
+                        <label class="checkbox-item"><input type="checkbox"> Asthma</label>
+                        <label class="checkbox-item"><input type="checkbox"> Cancer</label>
+                        <label class="checkbox-item"><input type="checkbox"> None of the above</label>
+                    </div>
+                </div>
+                <div class="form-group full-width"><label class="form-label" for="history-notes">Additional
+                        History</label><textarea id="history-notes" class="form-textarea"
+                        placeholder="Describe any other medical conditions, surgeries, or relevant history..."></textarea>
+                </div>
+            </div>
+            <!-- Symptoms -->
+            <div class="section">
+                <div class="section-title">Current Symptoms</div>
+                <div class="form-grid">
+                    <div class="form-group full-width"><label class="form-label" for="chief-complaint">Chief Complaint
+                            <span class="req">*</span></label><input type="text" id="chief-complaint" class="form-input"
+                            placeholder="Primary reason for visit"></div>
+                    <div class="form-group"><label class="form-label" for="symptom-duration">Duration</label><select
+                            id="symptom-duration" class="form-select">
+                            <option value="">Select</option>
+                            <option>Less than 1 week</option>
+                            <option>1-4 weeks</option>
+                            <option>1-3 months</option>
+                            <option>More than 3 months</option>
+                        </select></div>
+                    <div class="form-group"><label class="form-label" for="symptom-severity">Severity
+                            (1-10)</label><input type="number" id="symptom-severity" class="form-input" min="1" max="10"
+                            placeholder="1-10"></div>
+                </div>
+            </div>
+            <div class="action-bar">
+                <a href="wireframe-SCR-012-intake-summary.html" class="btn btn-primary btn-lg">Review & Submit</a>
+                <button type="button" class="btn btn-ghost btn-lg">Save Draft</button>
+            </div>
+        </form>
+    </main>
+</body>
+
+</html>

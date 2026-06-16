@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<!--
+  WIREFRAME: SCR-001 Patient Registration
+  FIDELITY: High
+  VIEWPORT: 1440x900 (Desktop)
+  FLOW: FL-001 Patient Registration & Login
+  NAV-LINKS:
+    - SCR-002 Login: wireframe-SCR-002-login.html (via "Already have account" link)
+  UXR: UXR-001 (Registration ≤3 min), UXR-101 (Clear field labels)
+  COMPONENTS: TextField(6), Button(2), Link(1), Alert(1), Card(1)
+-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCR-001 Patient Registration | Unified Patient Access</title>
+    <style>
+        /* ===== DESIGN TOKENS (from designsystem.md) ===== */
+        :root {
+            --color-primary: #1E6F9F;
+            --color-primary-hover: #175F87;
+            --color-secondary: #2D9F83;
+            --color-danger: #D32F2F;
+            --color-warning: #EF6C00;
+            --color-text-primary: #111827;
+            --color-text-secondary: #374151;
+            --color-text-muted: #6B7280;
+            --color-border: #D1D5DB;
+            --color-surface: #FFFFFF;
+            --color-bg: #F9FAFB;
+            --color-gray-100: #F3F4F6;
+            --surface-info: #E8F4FD;
+            --surface-success: #E6F7F1;
+            --surface-warning: #FFF3E0;
+            --surface-danger: #FDECEC;
+            --surface-hover: #F3F4F6;
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-full: 9999px;
+            --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-2: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-3: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --space-10: 40px;
+            --space-12: 48px;
+            --duration-fast: 150ms;
+            --duration-normal: 200ms;
+            --easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+            --header-height: 64px;
+        }
+
+        /* ===== RESET & BASE ===== */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--color-text-primary);
+            background: var(--color-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== PUBLIC HEADER (unauthenticated) ===== */
+        .public-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--space-8);
+            box-shadow: var(--shadow-1);
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--color-primary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .header-link {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-primary);
+            text-decoration: none;
+            transition: color var(--duration-fast) var(--easing-default);
+        }
+
+        .header-link:hover {
+            color: var(--color-primary-hover);
+        }
+
+        .header-link:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
+            border-radius: var(--radius-sm);
+        }
+
+        /* ===== REGISTRATION CARD ===== */
+        .reg-container {
+            margin-top: calc(var(--header-height) + var(--space-10));
+            width: 100%;
+            max-width: 520px;
+            padding: 0 var(--space-4);
+        }
+
+        .reg-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-3);
+            padding: var(--space-10) var(--space-8);
+        }
+
+        .reg-title {
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 40px;
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .reg-subtitle {
+            font-size: 14px;
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-8);
+        }
+
+        /* ===== FORM ELEMENTS ===== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-5);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+        }
+
+        .form-label .required {
+            color: var(--color-danger);
+            margin-left: 2px;
+        }
+
+        .form-input {
+            height: 40px;
+            padding: 0 var(--space-3);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: 16px;
+            color: var(--color-text-primary);
+            background: var(--color-surface);
+            transition: border-color var(--duration-fast) var(--easing-default),
+                box-shadow var(--duration-fast) var(--easing-default);
+        }
+
+        .form-input::placeholder {
+            color: var(--color-text-muted);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(30, 111, 159, 0.15);
+        }
+
+        .form-input.error {
+            border-color: var(--color-danger);
+            box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.1);
+        }
+
+        .form-error {
+            font-size: 12px;
+            color: var(--color-danger);
+            display: none;
+        }
+
+        .form-group.has-error .form-error {
+            display: block;
+        }
+
+        .form-group.has-error .form-input {
+            border-color: var(--color-danger);
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: var(--color-text-muted);
+        }
+
+        /* ===== PASSWORD FIELD ===== */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: var(--space-3);
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            padding: var(--space-1);
+        }
+
+        .password-toggle:hover {
+            color: var(--color-text-secondary);
+        }
+
+        .password-toggle:focus-visible {
+            outline: 2px solid var(--color-primary);
+            border-radius: var(--radius-sm);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            height: 40px;
+            padding: 0 var(--space-4);
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: background var(--duration-fast) var(--easing-default),
+                box-shadow var(--duration-fast) var(--easing-default);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .btn-lg {
+            height: 48px;
+            font-size: 16px;
+        }
+
+        /* ===== ALERT ===== */
+        .alert {
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-2);
+            margin-bottom: var(--space-5);
+        }
+
+        .alert-danger {
+            background: var(--surface-danger);
+            color: var(--color-danger);
+            border: 1px solid #F5C6C6;
+        }
+
+        .alert-icon {
+            flex-shrink: 0;
+            line-height: 1;
+            margin-top: 1px;
+        }
+
+        /* ===== DIVIDER ===== */
+        .divider {
+            border-top: 1px solid var(--color-border);
+            margin: var(--space-6) 0;
+        }
+
+        /* ===== FOOTER LINK ===== */
+        .reg-footer {
+            text-align: center;
+            margin-top: var(--space-6);
+        }
+
+        .reg-footer-text {
+            font-size: 14px;
+            color: var(--color-text-muted);
+        }
+
+        .reg-footer-text a {
+            color: var(--color-primary);
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .reg-footer-text a:hover {
+            text-decoration: underline;
+        }
+
+        .reg-footer-text a:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
+            border-radius: var(--radius-sm);
+        }
+
+        /* ===== ACCESSIBILITY ===== */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .reg-container {
+                max-width: 100%;
+            }
+
+            .reg-card {
+                padding: var(--space-6) var(--space-5);
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 390px) {
+            .reg-card {
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+                box-shadow: none;
+            }
+
+            .public-header {
+                padding: 0 var(--space-4);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- PUBLIC HEADER -->
+    <header class="public-header" role="banner">
+        <a href="wireframe-SCR-002-login.html" class="logo" aria-label="Unified Patient Access - Home">
+            <span class="logo-icon" aria-hidden="true">+</span>
+            Unified Patient Access
+        </a>
+        <a href="wireframe-SCR-002-login.html" class="header-link">Sign In</a>
+    </header>
+
+    <!-- REGISTRATION FORM -->
+    <main class="reg-container" role="main">
+        <div class="reg-card">
+            <h1 class="reg-title">Create Account</h1>
+            <p class="reg-subtitle">Register to book appointments and manage your health records.</p>
+
+            <!-- ERROR ALERT (shown on validation failure) -->
+            <div class="alert alert-danger" role="alert" style="display: none;" id="form-alert">
+                <span class="alert-icon" aria-hidden="true">⚠</span>
+                <span>Please correct the highlighted fields below.</span>
+            </div>
+
+            <form id="registration-form" novalidate>
+                <div class="form-grid">
+                    <!-- First Name -->
+                    <div class="form-group" id="group-firstName">
+                        <label class="form-label" for="firstName">
+                            First Name <span class="required" aria-label="required">*</span>
+                        </label>
+                        <input type="text" id="firstName" name="firstName" class="form-input"
+                            placeholder="Enter first name" required aria-describedby="firstName-error"
+                            autocomplete="given-name">
+                        <span class="form-error" id="firstName-error" role="alert">First name is required.</span>
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="form-group" id="group-lastName">
+                        <label class="form-label" for="lastName">
+                            Last Name <span class="required" aria-label="required">*</span>
+                        </label>
+                        <input type="text" id="lastName" name="lastName" class="form-input"
+                            placeholder="Enter last name" required aria-describedby="lastName-error"
+                            autocomplete="family-name">
+                        <span class="form-error" id="lastName-error" role="alert">Last name is required.</span>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group full-width" id="group-email">
+                        <label class="form-label" for="email">
+                            Email Address <span class="required" aria-label="required">*</span>
+                        </label>
+                        <input type="email" id="email" name="email" class="form-input" placeholder="you@example.com"
+                            required aria-describedby="email-error" autocomplete="email">
+                        <span class="form-error" id="email-error" role="alert">Please enter a valid email
+                            address.</span>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="form-group full-width" id="group-phone">
+                        <label class="form-label" for="phone">
+                            Phone Number <span class="required" aria-label="required">*</span>
+                        </label>
+                        <input type="tel" id="phone" name="phone" class="form-input" placeholder="(555) 123-4567"
+                            required aria-describedby="phone-error" autocomplete="tel">
+                        <span class="form-error" id="phone-error" role="alert">Please enter a valid phone number.</span>
+                    </div>
+
+                    <!-- Date of Birth -->
+                    <div class="form-group" id="group-dob">
+                        <label class="form-label" for="dob">
+                            Date of Birth <span class="required" aria-label="required">*</span>
+                        </label>
+                        <input type="date" id="dob" name="dob" class="form-input" required aria-describedby="dob-error"
+                            autocomplete="bday">
+                        <span class="form-error" id="dob-error" role="alert">Date of birth is required.</span>
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="form-group" id="group-gender">
+                        <label class="form-label" for="gender">Gender</label>
+                        <select id="gender" name="gender" class="form-input" autocomplete="sex">
+                            <option value="" disabled selected>Select gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="non-binary">Non-binary</option>
+                            <option value="prefer-not">Prefer not to say</option>
+                        </select>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group full-width" id="group-password">
+                        <label class="form-label" for="password">
+                            Password <span class="required" aria-label="required">*</span>
+                        </label>
+                        <div class="password-wrapper">
+                            <input type="password" id="password" name="password" class="form-input"
+                                placeholder="Min 8 characters" required aria-describedby="password-hint password-error"
+                                autocomplete="new-password" style="width:100%; padding-right: 48px;">
+                            <button type="button" class="password-toggle" aria-label="Show password">
+                                👁
+                            </button>
+                        </div>
+                        <span class="form-hint" id="password-hint">At least 8 characters with one uppercase, one number,
+                            and one special character.</span>
+                        <span class="form-error" id="password-error" role="alert">Password does not meet
+                            requirements.</span>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="form-group full-width" id="group-confirmPassword">
+                        <label class="form-label" for="confirmPassword">
+                            Confirm Password <span class="required" aria-label="required">*</span>
+                        </label>
+                        <div class="password-wrapper">
+                            <input type="password" id="confirmPassword" name="confirmPassword" class="form-input"
+                                placeholder="Re-enter password" required aria-describedby="confirmPassword-error"
+                                autocomplete="new-password" style="width:100%; padding-right: 48px;">
+                            <button type="button" class="password-toggle" aria-label="Show password">
+                                👁
+                            </button>
+                        </div>
+                        <span class="form-error" id="confirmPassword-error" role="alert">Passwords do not match.</span>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- Submit -->
+                <button type="submit" class="btn btn-primary btn-full btn-lg">
+                    Create Account
+                </button>
+            </form>
+
+            <!-- Footer Link -->
+            <div class="reg-footer">
+                <p class="reg-footer-text">
+                    Already have an account? <a href="wireframe-SCR-002-login.html">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <span class="sr-only" aria-live="polite" id="live-region"></span>
+</body>
+
+</html>

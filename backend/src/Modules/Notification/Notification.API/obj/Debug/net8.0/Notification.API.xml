@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Notification.API</name>
+    </assembly>
+    <members>
+        <member name="M:Notification.API.Controllers.CalendarSyncController.Connect(System.String)">
+            <summary>
+            Initiates OAuth flow for the specified calendar provider.
+            </summary>
+        </member>
+        <member name="M:Notification.API.Controllers.CalendarSyncController.GoogleCallback(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            OAuth callback for Google Calendar. Exchanges authorization code for tokens.
+            </summary>
+        </member>
+        <member name="M:Notification.API.Controllers.CalendarSyncController.OutlookCallback(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            OAuth callback for Outlook Calendar. Exchanges authorization code for tokens.
+            </summary>
+        </member>
+        <member name="M:Notification.API.Controllers.CalendarSyncController.GetSyncStatus(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Returns the sync status for a given appointment.
+            </summary>
+        </member>
+        <member name="M:Notification.API.Controllers.CalendarSyncController.Disconnect(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Disconnects a calendar provider for the current patient.
+            </summary>
+        </member>
+        <member name="M:Notification.API.Controllers.PdfConfirmationController.GetPdf(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Downloads or previews the PDF confirmation for an appointment.
+            </summary>
+            <param name="appointmentId">The appointment identifier.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>The PDF file or 404 if not found.</returns>
+        </member>
+        <member name="M:Notification.API.Controllers.PdfConfirmationController.GeneratePdf(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Manually triggers PDF generation and email delivery for an appointment.
+            </summary>
+            <param name="appointmentId">The appointment identifier.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+        </member>
+        <member name="T:Notification.API.Controllers.ReminderController">
+            <summary>
+            Manual reminder endpoints for proactive patient outreach (SCR-022).
+            </summary>
+        </member>
+        <member name="M:Notification.API.Controllers.ReminderController.SendReminder(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Sends an immediate reminder for a specific appointment.
+            Used for manual outreach to high-risk patients from the risk dashboard.
+            </summary>
+            <param name="appointmentId">The appointment ID to send a reminder for.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Success status.</returns>
+            <response code="204">Reminder sent successfully.</response>
+            <response code="404">Appointment not found.</response>
+            <response code="500">Failed to send reminder.</response>
+        </member>
+    </members>
+</doc>

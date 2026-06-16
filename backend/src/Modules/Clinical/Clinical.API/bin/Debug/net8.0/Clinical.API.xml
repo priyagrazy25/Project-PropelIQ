@@ -1,0 +1,500 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Clinical.API</name>
+    </assembly>
+    <members>
+        <member name="T:Clinical.API.Controllers.ConflictResolutionController">
+            <summary>
+            Conflict resolution endpoints (SCR-017, AC-2, AC-3).
+            Provides conflict details and resolution actions with audit trail.
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.ConflictResolutionController.GetConflictDetail(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Gets detailed conflict information for resolution UI (AC-1).
+            </summary>
+            <param name="conflictId">Conflict ID.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Conflict details with source information.</returns>
+            <response code="200">Conflict details returned successfully.</response>
+            <response code="404">Conflict not found.</response>
+            <response code="409">Conflict was already resolved.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.ConflictResolutionController.ResolveConflict(System.Guid,Clinical.API.Controllers.ResolveConflictApiRequest,System.Threading.CancellationToken)">
+            <summary>
+            Resolves a data conflict with the specified action (AC-2).
+            Creates audit record with before/after state (AC-3).
+            </summary>
+            <param name="conflictId">Conflict ID.</param>
+            <param name="request">Resolution request.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Resolution result.</returns>
+            <response code="200">Conflict resolved successfully.</response>
+            <response code="400">Invalid request (e.g., manual value required).</response>
+            <response code="404">Conflict not found.</response>
+            <response code="409">Conflict was already resolved by another user.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.ConflictResolutionController.GetCurrentUserId">
+            <summary>
+            Gets the current user ID from claims.
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.ConflictResolutionController.GetCurrentUserName">
+            <summary>
+            Gets the current user name from claims.
+            </summary>
+        </member>
+        <member name="T:Clinical.API.Controllers.ResolveConflictApiRequest">
+            <summary>
+            API request model for conflict resolution.
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.ResolveConflictApiRequest.#ctor(System.String,System.String,System.String)">
+            <summary>
+            API request model for conflict resolution.
+            </summary>
+        </member>
+        <member name="T:Clinical.API.Controllers.DocumentUploadController">
+            <summary>
+            Document upload endpoints for clinical document processing (UC-008, AC-2, AC-4, AC-5).
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.DocumentUploadController.UploadDocument(Microsoft.AspNetCore.Http.IFormFile,System.Threading.CancellationToken)">
+            <summary>
+            Uploads a clinical document for OCR/NLP processing (AC-2, AC-5).
+            </summary>
+            <param name="file">PDF file to upload.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Document ID and processing status.</returns>
+            <response code="201">Document uploaded and queued.</response>
+            <response code="400">Invalid file type or size.</response>
+            <response code="413">File exceeds maximum size.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.DocumentUploadController.GetProcessingStatus(System.Threading.CancellationToken)">
+            <summary>
+            Gets the processing pipeline status for all documents belonging to the authenticated patient (SCR-015).
+            Used by Processing Status page for UXR-403 processing transparency.
+            </summary>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>List of document pipeline statuses.</returns>
+        </member>
+        <member name="M:Clinical.API.Controllers.DocumentUploadController.GetDocumentStatus(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Gets the processing status of a document.
+            </summary>
+            <param name="documentId">Document ID.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Document status.</returns>
+        </member>
+        <member name="M:Clinical.API.Controllers.DocumentUploadController.IsPdfContentAsync(Microsoft.AspNetCore.Http.IFormFile,System.Threading.CancellationToken)">
+            <summary>
+            Validates PDF content by checking magic bytes.
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.InsuranceController.Validate(Clinical.Application.DTOs.InsuranceCheckRequest,System.Threading.CancellationToken)">
+            <summary>
+            Validates insurance name and member ID against seeded records (AC-1 through AC-4).
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.InsuranceController.Verify(Clinical.Application.DTOs.InsuranceVerifyRequest,System.Threading.CancellationToken)">
+            <summary>
+            Pre-check insurance coverage by name and member ID without appointment context (FR-018, UC-013).
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.InsuranceController.GetStatus(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Returns insurance verification status for a given appointment (AC-5).
+            </summary>
+        </member>
+        <member name="T:Clinical.API.Controllers.IntakeController">
+            <summary>
+            Intake session endpoints for AI conversational intake (AC-1, AC-2, AC-5)
+            and manual form-based intake (AC-1 through AC-4).
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.IntakeController.CreateSession(Clinical.API.Controllers.CreateIntakeSessionRequest,System.Threading.CancellationToken)">
+            <summary>
+            Creates a new intake session for a patient.
+            </summary>
+            <param name="request">Session creation request.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Created intake session.</returns>
+            <response code="201">Session created.</response>
+            <response code="400">Invalid request.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.IntakeController.SendMessage(System.Guid,Clinical.Application.DTOs.IntakeMessageRequest,System.Threading.CancellationToken)">
+            <summary>
+            Sends a patient message to the AI engine and returns parsed response with confidence scores.
+            Response within 5s at p95 per AIR-Q02.
+            </summary>
+            <param name="id">Session ID.</param>
+            <param name="request">Patient message.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>AI-parsed response with extracted fields.</returns>
+            <response code="200">Message processed.</response>
+            <response code="404">Session not found.</response>
+            <response code="408">AI processing timeout.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.IntakeController.UpdateFields(System.Guid,Clinical.Application.DTOs.FieldUpdateRequest,System.Threading.CancellationToken)">
+            <summary>
+            Updates individual parsed fields for review corrections (AC-5).
+            </summary>
+            <param name="id">Session ID.</param>
+            <param name="request">Field updates.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Updated session.</returns>
+            <response code="200">Fields updated.</response>
+            <response code="404">Session not found.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.IntakeController.CompleteSession(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Completes the intake session and persists the IntakeRecord.
+            </summary>
+            <param name="id">Session ID.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Completed session.</returns>
+            <response code="200">Session completed and persisted.</response>
+            <response code="404">Session not found.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.IntakeController.GetAiStatus(System.Threading.CancellationToken)">
+            <summary>
+            Returns AI service availability for the frontend circuit breaker (AC-4, NFR-013).
+            </summary>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>AI availability status.</returns>
+            <response code="200">AI is available.</response>
+            <response code="503">AI is unavailable.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.IntakeController.Chat(Clinical.API.Controllers.IntakeChatRequest,System.Threading.CancellationToken)">
+            <summary>
+            Convenience chat endpoint for the frontend AI intake flow.
+            Creates a session on first message; sends subsequent messages to existing session.
+            </summary>
+            <param name="request">Chat message with optional conversationId.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>AI response with extracted fields.</returns>
+            <response code="200">Message processed.</response>
+            <response code="400">Invalid request.</response>
+            <response code="408">AI processing timeout.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.IntakeController.GetIntake(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the current intake state for an appointment (draft or submitted).
+            </summary>
+            <param name="appointmentId">Appointment ID.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Current intake record.</returns>
+            <response code="200">Intake record retrieved.</response>
+            <response code="404">No intake record found.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.IntakeController.Autosave(System.Guid,Clinical.Application.DTOs.ManualIntakeRequest,System.Threading.CancellationToken)">
+            <summary>
+            Autosaves partial intake form state (AC-2: every 30s per UXR-505).
+            </summary>
+            <param name="appointmentId">Appointment ID.</param>
+            <param name="request">Partial intake form data.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Persisted draft state.</returns>
+            <response code="200">Draft saved.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.IntakeController.Submit(System.Guid,Clinical.Application.DTOs.ManualIntakeRequest,System.Threading.CancellationToken)">
+            <summary>
+            Submits the intake form with full validation (AC-3).
+            </summary>
+            <param name="appointmentId">Appointment ID.</param>
+            <param name="request">Complete intake form data.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Submitted intake record.</returns>
+            <response code="200">Intake submitted.</response>
+            <response code="422">Validation failed.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.IntakeController.UpdateFields(System.Guid,Clinical.Application.DTOs.IntakeFieldUpdateRequest,System.Threading.CancellationToken)">
+            <summary>
+            Updates individual fields after submission (AC-4, FR-017).
+            Patient-accessible without staff assistance.
+            </summary>
+            <param name="appointmentId">Appointment ID.</param>
+            <param name="request">Field-level updates.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Updated intake record.</returns>
+            <response code="200">Fields updated.</response>
+            <response code="404">Intake record not found.</response>
+            <response code="400">Invalid field names.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.IntakeController.SwitchMode(System.Guid,Clinical.Application.DTOs.ModeSwitchRequest,System.Threading.CancellationToken)">
+            <summary>
+            Switches intake mode between AI and manual, preserving data from the current mode.
+            </summary>
+            <param name="appointmentId">Appointment ID.</param>
+            <param name="request">Mode switch request with target mode.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Session state after mode switch.</returns>
+            <response code="200">Mode switched successfully.</response>
+            <response code="400">Invalid target mode or intake is locked.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.IntakeController.GetSummary(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Returns a categorized summary of intake data from both AI and manual modes.
+            Confidence scores are null for manual edits.
+            </summary>
+            <param name="appointmentId">Appointment ID.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Categorized intake summary.</returns>
+            <response code="200">Summary retrieved.</response>
+            <response code="404">No intake data found.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.IntakeController.ConfirmIntake(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Confirms and locks the intake record, preventing further edits.
+            </summary>
+            <param name="appointmentId">Appointment ID.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Locked intake summary.</returns>
+            <response code="200">Intake confirmed and locked.</response>
+            <response code="400">Intake already locked.</response>
+            <response code="404">No intake data found.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.IntakeController.SaveDraft(System.Text.Json.JsonElement,System.Threading.CancellationToken)">
+            <summary>
+            Saves a draft of the intake form (autosave from the frontend).
+            Persists via the persistence layer with nullable AppointmentId.
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.IntakeController.SubmitFromSummary(System.Text.Json.JsonElement,System.Threading.CancellationToken)">
+            <summary>
+            Submits the intake form from the review/summary page.
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.IntakeController.MapFromFrontendPayload(System.Text.Json.JsonElement,System.Guid)">
+            <summary>
+            Maps the structured frontend JSON into the flat ManualIntakeRequest DTO.
+            </summary>
+        </member>
+        <member name="T:Clinical.API.Controllers.AiHealthController">
+            <summary>
+            AI health check controller for circuit breaker status (NFR-013).
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.AiHealthController.GetHealth(System.Threading.CancellationToken)">
+            <summary>
+            Returns current AI service availability and circuit breaker status.
+            </summary>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>AI health status.</returns>
+            <response code="200">AI health status retrieved.</response>
+        </member>
+        <member name="T:Clinical.API.Controllers.AiHealthResponse">
+            <summary>
+            Response DTO for AI health check endpoint.
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.AiHealthResponse.#ctor(System.Boolean,System.String,System.DateTime)">
+            <summary>
+            Response DTO for AI health check endpoint.
+            </summary>
+        </member>
+        <member name="T:Clinical.API.Controllers.CreateIntakeSessionRequest">
+            <summary>
+            Request DTO for creating an intake session.
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.CreateIntakeSessionRequest.#ctor(System.Guid,System.Nullable{System.Guid})">
+            <summary>
+            Request DTO for creating an intake session.
+            </summary>
+        </member>
+        <member name="T:Clinical.API.Controllers.IntakeChatRequest">
+            <summary>
+            Request DTO for the frontend chat endpoint.
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.IntakeChatRequest.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Request DTO for the frontend chat endpoint.
+            </summary>
+        </member>
+        <member name="T:Clinical.API.Controllers.MedicalCodingController">
+            <summary>
+            Medical coding endpoints for ICD-10 and CPT code mapping (SCR-018, AIR-004, AIR-005).
+            Provides AI-driven code suggestions with staff verification workflow.
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.MedicalCodingController.MapDiagnosesToIcd10(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Maps patient diagnoses to ICD-10-CM codes using AI (AC-1, AC-2).
+            Returns top-3 candidates ranked by confidence with "Suggested" status.
+            </summary>
+            <param name="patientId">Patient ID.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>List of ICD-10 mapping results with candidates.</returns>
+            <response code="200">Mapping completed successfully.</response>
+            <response code="400">No diagnoses available for mapping.</response>
+            <response code="403">Not authorized to access patient data.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.MedicalCodingController.MapProceduresToCpt(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Maps patient procedures to CPT codes using AI (AIR-005).
+            Returns top-3 candidates ranked by confidence with "Suggested" status.
+            </summary>
+            <param name="patientId">Patient ID.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>List of CPT mapping results with candidates.</returns>
+            <response code="200">Mapping completed successfully.</response>
+            <response code="400">No procedures available for mapping.</response>
+            <response code="403">Not authorized to access patient data.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.MedicalCodingController.GetVerificationQueue(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets the code verification queue for staff (SCR-018).
+            Returns pending MedicalCode records requiring verification.
+            </summary>
+            <param name="status">Optional filter by verification status.</param>
+            <param name="codeType">Optional filter by code type (ICD-10 or CPT).</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>List of codes pending verification.</returns>
+        </member>
+        <member name="M:Clinical.API.Controllers.MedicalCodingController.VerifyCode(System.Guid,Clinical.API.Controllers.VerifyCodeRequest,System.Threading.CancellationToken)">
+            <summary>
+            Verifies (accepts or rejects) a code entry (UXR-602).
+            </summary>
+            <param name="entryId">MedicalCode ID.</param>
+            <param name="request">Verification action.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Updated code entry status.</returns>
+        </member>
+        <member name="M:Clinical.API.Controllers.MedicalCodingController.VerifyCodeWithOverride(System.Guid,Clinical.API.Controllers.VerifyCodeActionRequest,System.Threading.CancellationToken)">
+            <summary>
+            Verifies a code with full action support: accept, reject, or override (AIR-S04).
+            Supports preserving AI suggestion alongside manual override (AC-5).
+            </summary>
+            <param name="codeId">MedicalCode ID.</param>
+            <param name="request">Verification action details.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Verification result with updated code details.</returns>
+            <response code="200">Code verified successfully.</response>
+            <response code="400">Invalid verification request.</response>
+            <response code="404">Code not found.</response>
+            <response code="409">Code already verified.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.MedicalCodingController.GetAgreementRate(System.Threading.CancellationToken)">
+            <summary>
+            Gets the rolling 30-day agreement rate metrics (AIR-Q01).
+            Target: >98% agreement rate for AI code suggestions.
+            </summary>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Agreement rate metrics with trend data.</returns>
+        </member>
+        <member name="M:Clinical.API.Controllers.MedicalCodingController.GetVerificationStatistics(System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Gets verification statistics for dashboard (AIR-Q01).
+            </summary>
+            <param name="days">Number of days to include (default 30).</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Verification statistics with daily breakdown.</returns>
+        </member>
+        <member name="T:Clinical.API.Controllers.VerifyCodeActionRequest">
+            <summary>
+            Request model for verification actions with override support.
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.VerifyCodeActionRequest.#ctor(System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Request model for verification actions with override support.
+            </summary>
+        </member>
+        <member name="T:Clinical.API.Controllers.VerificationResultDto">
+            <summary>
+            Verification result with override details.
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.VerificationResultDto.#ctor(System.Guid,System.String,System.String,System.String,System.DateTime,System.Boolean,System.String,System.String)">
+            <summary>
+            Verification result with override details.
+            </summary>
+        </member>
+        <member name="T:Clinical.API.Controllers.AgreementRateDto">
+            <summary>
+            Rolling 30-day agreement rate metrics.
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.AgreementRateDto.#ctor(System.Double,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.DateTime,System.DateTime,System.Boolean,System.Double,System.Collections.Generic.IReadOnlyList{Clinical.API.Controllers.DailyRateDto})">
+            <summary>
+            Rolling 30-day agreement rate metrics.
+            </summary>
+        </member>
+        <member name="T:Clinical.API.Controllers.DailyRateDto">
+            <summary>
+            Daily agreement rate data point.
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.DailyRateDto.#ctor(System.DateTime,System.Double)">
+            <summary>
+            Daily agreement rate data point.
+            </summary>
+        </member>
+        <member name="T:Clinical.API.Controllers.VerificationStatisticsDto">
+            <summary>
+            Verification statistics for dashboard.
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.VerificationStatisticsDto.#ctor(System.Collections.Generic.IReadOnlyList{Clinical.API.Controllers.DailyCountDto},System.Double,System.Collections.Generic.IReadOnlyList{Clinical.API.Controllers.RejectionReasonDto})">
+            <summary>
+            Verification statistics for dashboard.
+            </summary>
+        </member>
+        <member name="T:Clinical.API.Controllers.DailyCountDto">
+            <summary>
+            Daily verification count breakdown.
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.DailyCountDto.#ctor(System.DateTime,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Daily verification count breakdown.
+            </summary>
+        </member>
+        <member name="T:Clinical.API.Controllers.RejectionReasonDto">
+            <summary>
+            Rejection reason with count.
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.RejectionReasonDto.#ctor(System.String,System.Int32)">
+            <summary>
+            Rejection reason with count.
+            </summary>
+        </member>
+        <member name="T:Clinical.API.Controllers.PatientView360Controller">
+            <summary>
+            360-degree patient view endpoints (SCR-016, AIR-002, NFR-004).
+            Provides aggregated clinical data with semantic de-duplication.
+            </summary>
+        </member>
+        <member name="M:Clinical.API.Controllers.PatientView360Controller.GetPatientView360(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Gets the 360-degree view for a specific patient (AC-1, AC-5, AC-6).
+            </summary>
+            <param name="patientId">Patient ID.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Aggregated patient view with categorized clinical data.</returns>
+            <response code="200">360-degree view returned successfully.</response>
+            <response code="404">Patient not found.</response>
+            <response code="403">Not authorized to view this patient's data.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.PatientView360Controller.GetCurrentPatientView360(System.Threading.CancellationToken)">
+            <summary>
+            Gets the 360-degree view for the current authenticated patient (AC-1, AC-5, AC-6).
+            </summary>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Aggregated patient view with categorized clinical data.</returns>
+            <response code="200">360-degree view returned successfully.</response>
+            <response code="404">Patient profile not found.</response>
+            <response code="400">Unable to identify patient.</response>
+        </member>
+        <member name="M:Clinical.API.Controllers.PatientView360Controller.CanAccessPatient(System.Guid)">
+            <summary>
+            Verifies if the current user can access the specified patient's data.
+            Patients can only view their own data. Staff (Provider, FrontDesk, Admin) can view any.
+            </summary>
+        </member>
+    </members>
+</doc>
