@@ -111,6 +111,12 @@ export function ProviderSearchPage() {
   useEffect(() => {
     executeSearchRef.current = executeSearch;
   }, [executeSearch]);
+
+  // Auto-load on mount — show earliest available slots without requiring a manual search
+  useEffect(() => {
+    executeSearchRef.current(1);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const pageRef = useRef(page);
   useEffect(() => {
     pageRef.current = page;
@@ -157,6 +163,13 @@ export function ProviderSearchPage() {
   const handleBookAppointment = useCallback(
     (provider: ProviderResult, slot: ProviderSlot) => {
       void navigate('/booking/confirm', { state: { provider, slot } });
+    },
+    [navigate],
+  );
+
+  const handleViewProfile = useCallback(
+    (provider: ProviderResult) => {
+      void navigate(`/providers/${provider.id}`, { state: { provider } });
     },
     [navigate],
   );
@@ -385,6 +398,7 @@ export function ProviderSearchPage() {
                           provider={provider}
                           onBookAppointment={handleBookAppointment}
                           onJoinWaitlist={handleJoinWaitlist}
+                          onViewProfile={handleViewProfile}
                         />
                       ))}
                     </div>
@@ -400,6 +414,7 @@ export function ProviderSearchPage() {
                   provider={provider}
                   onBookAppointment={handleBookAppointment}
                   onJoinWaitlist={handleJoinWaitlist}
+                  onViewProfile={handleViewProfile}
                 />
               ))}
             </div>

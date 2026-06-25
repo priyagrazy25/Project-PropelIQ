@@ -56,12 +56,27 @@ public sealed class SearchProvidersQueryHandler
             providersQuery = providersQuery.Where(p => p.Location != null && p.Location.ToLower().Contains(location));
         }
 
-        // If date filter, only include providers with available slots on that date
-        var dateFilter = query.Date ?? DateTime.UtcNow.Date;
-        var dateEnd = dateFilter.Date.AddDays(1);
+        // Determine slot search window:
+        // - Specific date requested → search that single day only (future-only cutoff for today)
+        // - No date requested       → search from now across the next 7 days so results always appear
+        var now = DateTime.UtcNow;
+        DateTime startCutoff;
+        DateTime dateEnd;
+
+        if (query.Date.HasValue)
+        {
+            var dateFilter = query.Date.Value.Date;
+            startCutoff = dateFilter == now.Date ? now : dateFilter;
+            dateEnd = dateFilter.AddDays(1);
+        }
+        else
+        {
+            startCutoff = now;
+            dateEnd = now.Date.AddDays(8); // next 7 full days
+        }
 
         providersQuery = providersQuery.Where(p =>
-            p.Slots.Any(s => s.Status == SlotStatus.Available && s.StartTime >= dateFilter.Date && s.StartTime < dateEnd));
+            p.Slots.Any(s => s.Status == SlotStatus.Available && s.StartTime >= startCutoff && s.StartTime < dateEnd));
 
         var totalCount = await providersQuery.CountAsync(cancellationToken);
 
@@ -71,7 +86,7 @@ public sealed class SearchProvidersQueryHandler
             "name" => providersQuery.OrderBy(p => p.Name),
             "rating" => providersQuery.OrderByDescending(p => p.Name), // Rating field not on entity; default to name
             _ => providersQuery.OrderBy(p => p.Slots
-                .Where(s => s.Status == SlotStatus.Available && s.StartTime >= dateFilter.Date && s.StartTime < dateEnd)
+                .Where(s => s.Status == SlotStatus.Available && s.StartTime >= startCutoff && s.StartTime < dateEnd)
                 .Min(s => s.StartTime)) // Earliest available
         };
 
@@ -86,7 +101,7 @@ public sealed class SearchProvidersQueryHandler
                 4.5, // Placeholder rating — no rating field on Provider entity
                 true, // Active providers are accepting patients
                 p.Slots
-                    .Where(s => s.Status == SlotStatus.Available && s.StartTime >= dateFilter.Date && s.StartTime < dateEnd)
+                    .Where(s => s.Status == SlotStatus.Available && s.StartTime >= startCutoff && s.StartTime < dateEnd)
                     .OrderBy(s => s.StartTime)
                     .Take(8) // Limit slots per card
                     .Select(s => new SlotDto(
@@ -96,7 +111,7 @@ public sealed class SearchProvidersQueryHandler
                         s.Status == SlotStatus.Available))
                     .ToList(),
                 p.Slots
-                    .Where(s => s.Status == SlotStatus.Available && s.StartTime >= dateFilter.Date)
+                    .Where(s => s.Status == SlotStatus.Available && s.StartTime >= startCutoff)
                     .OrderBy(s => s.StartTime)
                     .Select(s => (DateTime?)s.StartTime)
                     .FirstOrDefault()))

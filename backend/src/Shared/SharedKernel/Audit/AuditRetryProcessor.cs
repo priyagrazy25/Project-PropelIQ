@@ -102,7 +102,7 @@ public sealed class AuditRetryProcessor : BackgroundService
 
             try
             {
-                var auditLog = JsonSerializer.Deserialize<T>(item!, JsonOptions);
+                var auditLog = JsonSerializer.Deserialize<T>((string)item!, JsonOptions);
                 if (auditLog != null)
                 {
                     dbContext.Set<T>().Add(auditLog);
