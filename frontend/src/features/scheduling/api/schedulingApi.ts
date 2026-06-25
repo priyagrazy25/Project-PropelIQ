@@ -634,7 +634,7 @@ export async function searchPatients(
         dateOfBirth: p.dateOfBirth,
         contactNumber: p.contactNumber,
         email: p.email,
-        mrn: '', // Backend doesn't return MRN in search
+        mrn: (p.mrn as string) ?? '',
       }));
       return { success: true, data };
     }

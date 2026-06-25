@@ -109,5 +109,5 @@ Build the provider search API with specialty, name, and date range filters using
 - [x] Implement event-driven cache invalidation on slot mutations
 - [x] Add SignalR AppointmentHub broadcast for slot-availability changes
 - [x] Implement server-side pagination with total count metadata
-- [ ] Add response compression and ETag for search results
+- [x] Add response compression and ETag for search results
 - [x] Return standardized ProblemDetails for all error responses

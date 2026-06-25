@@ -56,13 +56,37 @@ public sealed class NoShowRiskService : INoShowRiskService
             .Where(a => a.Status == AppointmentStatus.Scheduled)
             .ToListAsync(cancellationToken);
 
+        // Load any pre-computed scores for these appointments
+        var appointmentIds = appointments.Select(a => a.Id).ToList();
+        var storedScores = await _dbContext.NoShowRiskScores
+            .Where(s => appointmentIds.Contains(s.AppointmentId) && !s.IsDeleted)
+            .ToListAsync(cancellationToken);
+        var storedScoreMap = storedScores.ToDictionary(s => s.AppointmentId);
+
         var assessments = new List<AppointmentRiskAssessment>();
 
         foreach (var appointment in appointments)
         {
-            // Build input from appointment data
-            var input = await BuildRiskInputAsync(appointment, cancellationToken);
-            var prediction = _predictionEngine.Predict(input);
+            int riskScore;
+            string riskLevel;
+            IReadOnlyList<string> contributingFactors;
+
+            // Use pre-computed score if available, otherwise run ML model
+            if (storedScoreMap.TryGetValue(appointment.Id, out var stored))
+            {
+                riskScore = stored.Score;
+                riskLevel = riskScore switch { <= 30 => "Low", <= 70 => "Medium", _ => "High" };
+                contributingFactors = stored.RiskFactors?.Split("; ", StringSplitOptions.RemoveEmptyEntries)
+                    ?? Array.Empty<string>();
+            }
+            else
+            {
+                var input = await BuildRiskInputAsync(appointment, cancellationToken);
+                var prediction = _predictionEngine.Predict(input);
+                riskScore = prediction.RiskScore;
+                riskLevel = prediction.RiskLevel;
+                contributingFactors = prediction.ContributingFactors;
+            }
 
             var assessment = new AppointmentRiskAssessment(
                 AppointmentId: appointment.Id,
@@ -70,9 +94,9 @@ public sealed class NoShowRiskService : INoShowRiskService
                 PatientName: "Patient", // TODO: Fetch from Identity module
                 AppointmentDateTime: appointment.AppointmentDateTime,
                 ProviderName: appointment.Slot?.Provider?.Name ?? "Unknown",
-                RiskScore: prediction.RiskScore,
-                RiskLevel: prediction.RiskLevel,
-                ContributingFactors: prediction.ContributingFactors);
+                RiskScore: riskScore,
+                RiskLevel: riskLevel,
+                ContributingFactors: contributingFactors);
 
             assessments.Add(assessment);
         }

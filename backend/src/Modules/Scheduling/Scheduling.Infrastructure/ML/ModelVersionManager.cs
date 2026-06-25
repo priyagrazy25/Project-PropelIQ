@@ -228,7 +228,8 @@ public sealed class ModelVersionManager
     /// </summary>
     public StoredModelVersion? GetActiveStoredVersion()
     {
-        return _metadata.Versions.FirstOrDefault(v => v.IsActive);
+        var activeVersion = _metadata.Versions.FirstOrDefault(v => v.IsActive);
+        return activeVersion is null ? null : ResolveStoredVersion(activeVersion);
     }
 
     /// <summary>
@@ -237,6 +238,14 @@ public sealed class ModelVersionManager
     public string? GetActiveModelPath()
     {
         return GetActiveStoredVersion()?.ModelPath;
+    }
+
+    /// <summary>
+    /// Gets the canonical model path for a version in the current model directory.
+    /// </summary>
+    public string GetCanonicalModelPath(string version)
+    {
+        return GetModelPath(version);
     }
 
     /// <summary>
@@ -272,6 +281,32 @@ public sealed class ModelVersionManager
     private string GetModelPath(string version)
     {
         return Path.Combine(_modelDirectory, $"noshow-model-{version}.zip");
+    }
+
+    private StoredModelVersion ResolveStoredVersion(StoredModelVersion storedVersion)
+    {
+        if (File.Exists(storedVersion.ModelPath))
+        {
+            return storedVersion;
+        }
+
+        var canonicalPath = GetModelPath(storedVersion.Version);
+        if (string.Equals(storedVersion.ModelPath, canonicalPath, StringComparison.OrdinalIgnoreCase))
+        {
+            return storedVersion;
+        }
+
+        if (File.Exists(canonicalPath))
+        {
+            _logger.LogInformation(
+                "Resolved model version {Version} to current workspace path {Path}",
+                storedVersion.Version,
+                canonicalPath);
+
+            return storedVersion with { ModelPath = canonicalPath };
+        }
+
+        return storedVersion with { ModelPath = canonicalPath };
     }
 
     private void EnsureDirectoryExists()

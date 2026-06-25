@@ -76,11 +76,13 @@ export function PatientSearchBar({
   );
 
   useEffect(() => {
+    // Auto-load all patients on mount so list is visible immediately (like provider dropdown)
+    executeSearch('');
     return () => {
       abortRef.current?.abort();
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, []);
+  }, [executeSearch]);
 
   const handleInputChange = (value: string) => {
     setQuery(value);
@@ -92,16 +94,16 @@ export function PatientSearchBar({
       timerRef.current = setTimeout(() => {
         executeSearch(value.trim());
       }, DEBOUNCE_MS);
-    } else {
-      setResults([]);
-      setHasSearched(false);
+    } else if (value.trim().length === 0) {
+      // Show all patients when search box is cleared
+      timerRef.current = setTimeout(() => {
+        executeSearch('');
+      }, DEBOUNCE_MS);
     }
   };
 
   const handleSearchClick = () => {
-    if (query.trim().length >= 2) {
-      executeSearch(query.trim());
-    }
+    executeSearch(query.trim());
   };
 
   const handleSelect = (patient: PatientSearchResult) => {
@@ -127,7 +129,7 @@ export function PatientSearchBar({
           onKeyDown={handleKeyDown}
           className="flex-1 h-10"
         />
-        <Button onClick={handleSearchClick} disabled={query.trim().length < 2}>
+        <Button onClick={handleSearchClick}>
           <Search className="h-4 w-4 mr-1" aria-hidden="true" />
           Search
         </Button>

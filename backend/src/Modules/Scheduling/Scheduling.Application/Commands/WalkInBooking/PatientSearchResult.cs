@@ -6,4 +6,5 @@ public sealed record PatientSearchResult(
     string FullName,
     string Email,
     string? ContactNumber,
-    DateOnly? DateOfBirth);
+    DateOnly? DateOfBirth,
+    string Mrn = "");

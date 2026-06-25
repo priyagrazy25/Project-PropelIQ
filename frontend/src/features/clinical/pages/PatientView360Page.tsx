@@ -6,7 +6,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  Activity,
   AlertTriangle,
   ChevronRight,
   FileText,
@@ -14,6 +13,7 @@ import {
   Pill,
   Stethoscope,
   TestTube,
+  User,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -25,6 +25,8 @@ import {
   type Patient360ViewResponse,
 } from '../api/patient360Api';
 import { ConflictBanner, ConflictWarningBanner } from '../components/ConflictBanner';
+import { searchPatients } from '../../scheduling/api/schedulingApi';
+import { PatientSearchBar } from '../../scheduling/components/PatientSearchBar';
 import { ConfidenceScoreBadge } from '../components/ConfidenceScoreBadge';
 import {
   ConflictCountBadge,
@@ -32,14 +34,13 @@ import {
   VerifiedBadge,
 } from '../components/ConflictInlineIndicator';
 
-/** Tab definitions matching DR-006 categories. */
+/** Tab definitions matching SCR-016 wireframe (5 data tabs + 1 conflicts tab). */
 const TABS = [
-  { id: 'vitals', label: 'Vitals', icon: Activity, category: 'vital' as DataCategory },
-  { id: 'history', label: 'Medical History', icon: History, category: 'history' as DataCategory },
+  { id: 'demographics', label: 'Demographics', icon: User, category: 'vital' as DataCategory },
   { id: 'medications', label: 'Medications', icon: Pill, category: 'medication' as DataCategory },
-  { id: 'allergies', label: 'Allergies', icon: AlertTriangle, category: 'allergy' as DataCategory },
-  { id: 'labs', label: 'Lab Results', icon: TestTube, category: 'lab' as DataCategory },
   { id: 'diagnoses', label: 'Diagnoses', icon: Stethoscope, category: 'diagnosis' as DataCategory },
+  { id: 'labs', label: 'Labs', icon: TestTube, category: 'lab' as DataCategory },
+  { id: 'encounters', label: 'Encounters', icon: History, category: 'history' as DataCategory },
 ] as const;
 
 /**
@@ -56,14 +57,14 @@ export function PatientView360Page() {
   const patientId = urlPatientId ?? currentPatientId;
   
   const [data, setData] = useState<Patient360ViewResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!!patientId);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('vitals');
+  const [activeTab, setActiveTab] = useState<string>('demographics');
 
   useEffect(() => {
-    // Redirect to staff queue only if no patientId available at all
     if (!patientId) {
-      void navigate('/staff/queue', { replace: true });
+      // No patient selected — stay on page and show selection prompt
+      setIsLoading(false);
       return;
     }
 
@@ -120,6 +121,23 @@ export function PatientView360Page() {
     return <PatientView360Skeleton />;
   }
 
+  // No patient selected — staff accessed /staff/patient-view directly from nav
+  if (!patientId) {
+    return (
+      <div className="mx-auto max-w-3xl space-y-4 p-6">
+        <h1 className="text-2xl font-bold text-foreground">Patient Lookup</h1>
+        <p className="text-sm text-muted-foreground">
+          Search for a patient by name, phone, or MRN to view their 360° health profile.
+        </p>
+        <PatientSearchBar
+          searchFn={searchPatients}
+          onSelect={(patient) => void navigate(`/staff/patient-view/${patient.id}`)}
+          onCreateNew={() => void navigate('/staff/walk-in')}
+        />
+      </div>
+    );
+  }
+
   if (error && !data) {
     return (
       <div className="mx-auto max-w-4xl space-y-6 p-6">
@@ -140,14 +158,17 @@ export function PatientView360Page() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-6">
-      {/* Breadcrumb */}
+      {/* Breadcrumb (SCR-016) */}
       <nav className="flex items-center gap-1 text-sm" aria-label="Breadcrumb">
-        <Link to="/staff/queue" className="text-primary hover:underline">
-          Queue
+        <Link
+          to={urlPatientId ? '/staff/dashboard' : '/'}
+          className="text-primary hover:underline"
+        >
+          Dashboard
         </Link>
         <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
         <span className="text-muted-foreground" aria-current="page">
-          Patient View
+          {urlPatientId ? 'Patient View' : 'Health Profile'}
         </span>
       </nav>
 
@@ -214,6 +235,16 @@ export function PatientView360Page() {
               </TabsTrigger>
             );
           })}
+          {/* Conflicts tab trigger (SCR-016 wireframe) */}
+          <TabsTrigger value="conflicts" className="gap-2">
+            <AlertTriangle className="size-4" />
+            Conflicts
+            {data.conflicts.length > 0 && (
+              <span className="ml-1 rounded-full bg-destructive/10 px-1.5 py-0.5 text-xs text-destructive">
+                {data.conflicts.length}
+              </span>
+            )}
+          </TabsTrigger>
         </TabsList>
 
         {TABS.map((tab) => {
@@ -236,6 +267,11 @@ export function PatientView360Page() {
             </TabsContent>
           );
         })}
+
+        {/* Conflicts tab content (SCR-016 wireframe) */}
+        <TabsContent value="conflicts">
+          <ConflictsTable conflicts={data.conflicts} />
+        </TabsContent>
       </Tabs>
     </div>
   );
@@ -333,6 +369,79 @@ function DataCategoryTable({
               </TableRow>
             );
           })}
+        </TableBody>
+      </Table>
+    </Card>
+  );
+}
+
+/** Conflicts table for the Conflicts tab (SCR-016 wireframe). */
+function ConflictsTable({ conflicts }: { conflicts: ConflictSummary[] }) {
+  const SEVERITY_STYLES: Record<ConflictSummary['severity'], string> = {
+    high: 'bg-red-50 text-red-700',
+    medium: 'bg-amber-50 text-amber-700',
+    low: 'bg-blue-50 text-blue-700',
+  };
+
+  if (conflicts.length === 0) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+          <FileText className="mb-4 size-12 text-muted-foreground" />
+          <p className="text-muted-foreground">No conflicts detected. All data is consistent.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Field</TableHead>
+            <TableHead>Conflicting Values</TableHead>
+            <TableHead>Category</TableHead>
+            <TableHead>Severity</TableHead>
+            <TableHead className="text-right">Action</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {conflicts.map((conflict) => (
+            <TableRow key={conflict.conflictId}>
+              <TableCell className="font-medium">{conflict.field}</TableCell>
+              <TableCell>
+                <div className="flex flex-wrap gap-1">
+                  {conflict.values.map((v, i) => (
+                    <span
+                      key={i}
+                      className="rounded bg-muted px-2 py-0.5 text-xs font-mono"
+                    >
+                      {v}
+                    </span>
+                  ))}
+                </div>
+              </TableCell>
+              <TableCell className="capitalize text-muted-foreground">
+                {conflict.category}
+              </TableCell>
+              <TableCell>
+                <span
+                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${SEVERITY_STYLES[conflict.severity]}`}
+                >
+                  {conflict.severity}
+                </span>
+              </TableCell>
+              <TableCell className="text-right">
+                <Link
+                  to={`/clinical/conflicts/${conflict.conflictId}`}
+                  className="text-sm font-medium text-primary hover:underline"
+                >
+                  Resolve
+                </Link>
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </Card>

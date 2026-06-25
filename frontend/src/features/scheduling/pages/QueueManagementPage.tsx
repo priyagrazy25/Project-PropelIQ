@@ -114,9 +114,11 @@ export function QueueManagementPage() {
       });
 
       if (result.success) {
-        // Replace with server-confirmed entry (updated rowVersion)
+        // Replace with server-confirmed entry (updated rowVersion), preserving
+        // the display position — the server returns position=0 for single-entry
+        // updates since position is only meaningful in the full queue context.
         setEntries((prev) =>
-          prev.map((e) => (e.id === entryId ? result.data : e)),
+          prev.map((e) => (e.id === entryId ? { ...result.data, position: e.position } : e)),
         );
       } else {
         // Rollback optimistic update

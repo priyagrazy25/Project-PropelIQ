@@ -33,6 +33,13 @@ public sealed class ConflictResolutionService : IConflictResolutionService
     }
 
     /// <inheritdoc />
+    public async Task<int> GetOpenConflictCountAsync(CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.DataConflicts
+            .CountAsync(c => c.ResolutionStatus == ConflictResolutionStatus.Open && !c.IsDeleted, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public async Task<Result<ConflictDetailResponse>> GetConflictDetailAsync(
         Guid conflictId,
         CancellationToken cancellationToken = default)

@@ -26,10 +26,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Host\Host.csproj" />
     <ProjectReference Include="..\..\src\Shared\SharedKernel\SharedKernel.csproj" />
     <ProjectReference Include="..\..\src\Modules\Identity\Identity.Application\Identity.Application.csproj" />
     <ProjectReference Include="..\..\src\Modules\Scheduling\Scheduling.Application\Scheduling.Application.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Scheduling\Scheduling.API\Scheduling.API.csproj" />
     <ProjectReference Include="..\..\src\Modules\Clinical\Clinical.Application\Clinical.Application.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Notification\Notification.Application\Notification.Application.csproj" />
     <ProjectReference Include="..\..\src\Modules\Identity\Identity.Domain\Identity.Domain.csproj" />
     <ProjectReference Include="..\..\src\Modules\Scheduling\Scheduling.Domain\Scheduling.Domain.csproj" />
     <ProjectReference Include="..\..\src\Modules\Clinical\Clinical.Domain\Clinical.Domain.csproj" />

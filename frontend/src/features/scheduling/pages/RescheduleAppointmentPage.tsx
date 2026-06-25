@@ -138,7 +138,10 @@ export function RescheduleAppointmentPage() {
       .then((result) => {
         if (result.success) {
           toast.success('Appointment rescheduled successfully.');
-          void navigate('/dashboard', { replace: true });
+          void navigate('/dashboard', {
+            replace: true,
+            state: { refreshDashboard: Date.now() },
+          });
         } else if (result.error.status === 409) {
           setConflictError(true);
           setSlots((prev) =>
@@ -339,7 +342,10 @@ export function RescheduleAppointmentPage() {
           slotStartTime={appointment.appointmentDateTime}
           onCancelled={() => {
             toast.success('Appointment cancelled successfully.');
-            void navigate('/dashboard', { replace: true });
+            void navigate('/dashboard', {
+              replace: true,
+              state: { refreshDashboard: Date.now() },
+            });
           }}
           onClose={() => {
             setShowCancelDialog(false);

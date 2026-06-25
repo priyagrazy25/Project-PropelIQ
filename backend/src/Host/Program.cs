@@ -9,6 +9,7 @@ using Notification.Infrastructure;
 using Notification.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
@@ -268,6 +269,13 @@ builder.Services.AddControllers()
     .AddApplicationPart(typeof(Notification.API.Controllers.NotificationController).Assembly);
 
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat([
+        "application/json"
+    ]);
+});
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
@@ -316,6 +324,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("FrontendPolicy");
+app.UseResponseCompression();
 
 // Rate limiting middleware (AC-4)
 app.UseRateLimiter();

@@ -23,7 +23,7 @@ import {
   Upload,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAppSelector } from '../../../app/hooks';
 import { fetchPatient360View } from '../../clinical/api/patient360Api';
@@ -73,6 +73,7 @@ function badgeVariant(
 }
 
 export function PatientDashboardPage() {
+  const location = useLocation();
   const fullName = useAppSelector((state) => state.identity.fullName);
   const firstName = fullName?.split(' ')[0] ?? 'Patient';
 
@@ -113,6 +114,16 @@ export function PatientDashboardPage() {
   useEffect(() => {
     void loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    const state = location.state as
+      | { refreshDashboard?: number }
+      | null
+      | undefined;
+    if (typeof state?.refreshDashboard === 'number') {
+      void loadData();
+    }
+  }, [location.state, loadData]);
 
   const upcoming = useMemo(
     () => appointments.filter((a) => ACTIVE_STATUSES.has(a.status)),
