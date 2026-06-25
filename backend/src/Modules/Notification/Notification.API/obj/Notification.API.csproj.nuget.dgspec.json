@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Notification\\Notification.API\\Notification.API.csproj": {}
+    "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Notification\\Notification.API\\Notification.API.csproj": {}
   },
   "projects": {
-    "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Notification\\Notification.API\\Notification.API.csproj": {
+    "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Notification\\Notification.API\\Notification.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Notification\\Notification.API\\Notification.API.csproj",
+        "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Notification\\Notification.API\\Notification.API.csproj",
         "projectName": "Notification.API",
-        "projectPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Notification\\Notification.API\\Notification.API.csproj",
+        "projectPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Notification\\Notification.API\\Notification.API.csproj",
         "packagesPath": "C:\\Users\\PriyatharshaniRajama\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Notification\\Notification.API\\obj\\",
+        "outputPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Notification\\Notification.API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -33,11 +33,11 @@
             "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Notification\\Notification.Application\\Notification.Application.csproj": {
-                "projectPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Notification\\Notification.Application\\Notification.Application.csproj"
+              "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Notification\\Notification.Application\\Notification.Application.csproj": {
+                "projectPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Notification\\Notification.Application\\Notification.Application.csproj"
               },
-              "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Notification\\Notification.Domain\\Notification.Domain.csproj": {
-                "projectPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Notification\\Notification.Domain\\Notification.Domain.csproj"
+              "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Notification\\Notification.Domain\\Notification.Domain.csproj": {
+                "projectPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Notification\\Notification.Domain\\Notification.Domain.csproj"
               }
             }
           }
@@ -95,14 +95,14 @@
         }
       }
     },
-    "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Notification\\Notification.Application\\Notification.Application.csproj": {
+    "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Notification\\Notification.Application\\Notification.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Notification\\Notification.Application\\Notification.Application.csproj",
+        "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Notification\\Notification.Application\\Notification.Application.csproj",
         "projectName": "Notification.Application",
-        "projectPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Notification\\Notification.Application\\Notification.Application.csproj",
+        "projectPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Notification\\Notification.Application\\Notification.Application.csproj",
         "packagesPath": "C:\\Users\\PriyatharshaniRajama\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Notification\\Notification.Application\\obj\\",
+        "outputPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Notification\\Notification.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -124,8 +124,8 @@
             "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Notification\\Notification.Domain\\Notification.Domain.csproj": {
-                "projectPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Notification\\Notification.Domain\\Notification.Domain.csproj"
+              "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Notification\\Notification.Domain\\Notification.Domain.csproj": {
+                "projectPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Notification\\Notification.Domain\\Notification.Domain.csproj"
               }
             }
           }
@@ -194,14 +194,14 @@
         }
       }
     },
-    "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Notification\\Notification.Domain\\Notification.Domain.csproj": {
+    "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Notification\\Notification.Domain\\Notification.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Notification\\Notification.Domain\\Notification.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Notification\\Notification.Domain\\Notification.Domain.csproj",
         "projectName": "Notification.Domain",
-        "projectPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Notification\\Notification.Domain\\Notification.Domain.csproj",
+        "projectPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Notification\\Notification.Domain\\Notification.Domain.csproj",
         "packagesPath": "C:\\Users\\PriyatharshaniRajama\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Notification\\Notification.Domain\\obj\\",
+        "outputPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Notification\\Notification.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -223,8 +223,8 @@
             "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj": {
-                "projectPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj"
+              "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj": {
+                "projectPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj"
               }
             }
           }
@@ -279,14 +279,14 @@
         }
       }
     },
-    "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj": {
+    "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj",
+        "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj",
         "projectName": "SharedKernel",
-        "projectPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj",
+        "projectPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj",
         "packagesPath": "C:\\Users\\PriyatharshaniRajama\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Shared\\SharedKernel\\obj\\",
+        "outputPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Shared\\SharedKernel\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

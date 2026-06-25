@@ -24,7 +24,7 @@ function getRoleRedirectPath(
     case 'FrontDesk':
       return '/queue';
     case 'Admin':
-      return '/management';
+      return '/management/dashboard';
   }
 }
 
