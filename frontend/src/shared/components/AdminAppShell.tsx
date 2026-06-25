@@ -4,7 +4,6 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import {
   AlertTriangle,
-  Bell,
   ClipboardList,
   Hash,
   LayoutDashboard,
@@ -22,14 +21,9 @@ import { logout } from '../../features/identity/identitySlice';
 import { clearAccessToken } from '../api/authInterceptor';
 
 const adminNavItems = [
-  { to: '/management', icon: Users, label: 'User Management' },
   { to: '/management/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/management/queue', icon: ClipboardList, label: 'Queue' },
-  { to: '/management/conflicts', icon: Zap, label: 'Conflicts' },
-  { to: '/management/codes', icon: Hash, label: 'Medical Codes' },
-  { to: '/management/risk', icon: AlertTriangle, label: 'Risk' },
+  { to: '/management', icon: Users, label: 'Users' },
   { to: '/management/audit', icon: Shield, label: 'Audit Logs' },
-  { to: '/management/settings', icon: Settings, label: 'Settings' },
 ] as const;
 
 export function AdminAppShell() {
@@ -69,14 +63,6 @@ export function AdminAppShell() {
           Admin Portal
         </NavLink>
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Notifications"
-            className="relative"
-          >
-            <Bell className="h-5 w-5 text-muted-foreground" />
-          </Button>
           <Avatar className="h-9 w-9 cursor-pointer">
             <AvatarFallback className="bg-secondary text-secondary-foreground text-sm font-semibold">
               {initials}

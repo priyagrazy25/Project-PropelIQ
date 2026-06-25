@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "fo2OG/2b3+E=",
+  "dgSpecHash": "VYHHLrlHc98=",
   "success": true,
-  "projectFilePath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Clinical\\Clinical.API\\Clinical.API.csproj",
+  "projectFilePath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Clinical\\Clinical.API\\Clinical.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\PriyatharshaniRajama\\.nuget\\packages\\fluentvalidation\\11.11.0\\fluentvalidation.11.11.0.nupkg.sha512",
     "C:\\Users\\PriyatharshaniRajama\\.nuget\\packages\\microsoft.entityframeworkcore\\8.0.11\\microsoft.entityframeworkcore.8.0.11.nupkg.sha512",

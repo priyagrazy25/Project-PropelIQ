@@ -71,6 +71,14 @@ export function UserTable({
   const startItem = (page - 1) * pageSize + 1;
   const endItem = Math.min(page * pageSize, totalCount);
 
+  // Map backend role values to display labels
+  const roleDisplayMap: Record<string, string> = {
+    'FrontDesk': 'Staff',
+    'Patient': 'Patient',
+    'Admin': 'Admin',
+    'Provider': 'Provider',
+  };
+
   if (!loading && users.length === 0) {
     return (
       <Card>
@@ -109,7 +117,7 @@ export function UserTable({
                     </TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell>
-                      <Badge variant="outline">{user.role}</Badge>
+                      <Badge variant="outline">{roleDisplayMap[user.role] || user.role}</Badge>
                     </TableCell>
                     <TableCell>
                       <Badge

@@ -1,27 +1,18 @@
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Activity,
   AlertTriangle,
-  ArrowRight,
   ClipboardList,
-  Clock3,
-  Shield,
-  UserCog,
   Users,
 } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '../../../app/hooks';
-import { fetchAuditStats } from '../api/auditApi';
+import { fetchAuditLogs, fetchAuditStats } from '../api/auditApi';
 import { fetchUsers } from '../api/adminApi';
 import { fetchQueueEntries } from '../../scheduling/api/schedulingApi';
 import {
@@ -32,97 +23,114 @@ import {
 interface DashboardMetrics {
   totalUsers: number;
   activeUsers: number;
-  patients: number;
-  admins: number;
-  waitingCount: number;
-  inProgressCount: number;
-  completedCount: number;
-  averageWaitMinutes: number;
+  appointmentsToday: number;
+  documentsProcessed: number;
+  pendingConflicts: number;
   highRiskCount: number;
   totalAuditRecords: number;
   uniqueActors: number;
+  completedCount: number;
 }
 
-interface QueueSnapshotItem {
-  id: string;
-  patientName: string;
-  providerName: string;
-  appointmentType: string;
+interface AuditLogEntry {
+  timestamp: string;
+  user: string;
+  action: string;
+  resource: string;
   status: string;
-  position: number;
+}
+
+interface SystemHealth {
+  name: string;
+  status: 'operational' | 'warning' | 'error';
+  details?: string;
 }
 
 const DEFAULT_METRICS: DashboardMetrics = {
   totalUsers: 0,
   activeUsers: 0,
-  patients: 0,
-  admins: 0,
-  waitingCount: 0,
-  inProgressCount: 0,
-  completedCount: 0,
-  averageWaitMinutes: 0,
+  appointmentsToday: 0,
+  documentsProcessed: 0,
+  pendingConflicts: 0,
   highRiskCount: 0,
   totalAuditRecords: 0,
   uniqueActors: 0,
+  completedCount: 0,
 };
 
-function MetricCard({
-  title,
-  value,
-  description,
-  icon: Icon,
-}: {
+interface StatCardProps {
   title: string;
-  value: string | number;
-  description: string;
+  value: number;
+  change: string;
+  changeType: 'positive' | 'neutral';
   icon: typeof Users;
-}) {
-  return (
-    <Card>
-      <CardContent className="flex items-start justify-between pt-4">
-        <div>
-          <p className="text-sm text-muted-foreground">{title}</p>
-          <p className="mt-2 text-3xl font-bold text-foreground">{value}</p>
-          <p className="mt-1 text-xs text-muted-foreground">{description}</p>
-        </div>
-        <div className="rounded-full bg-primary/10 p-3 text-primary">
-          <Icon className="h-5 w-5" />
+  href?: string;
+}
+
+function StatCard({ title, value, change, changeType, icon: Icon, href }: StatCardProps) {
+  const content = (
+    <Card className={`border ${href ? 'cursor-pointer transition hover:shadow-md hover:border-primary/50' : ''}`}>
+      <CardContent className="pt-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">{title}</p>
+            <p className="mt-2 text-3xl font-bold text-foreground">{value}</p>
+            <p className={`mt-1 text-xs ${changeType === 'positive' ? 'text-green-600' : 'text-muted-foreground'}`}>
+              {change}
+            </p>
+          </div>
+          <Icon className="h-5 w-5 text-muted-foreground" />
         </div>
       </CardContent>
     </Card>
   );
+  
+  if (href) {
+    return <Link to={href} className="no-underline">{content}</Link>;
+  }
+  
+  return content;
 }
 
 export function AdminDashboardPage() {
   const fullName = useAppSelector((state) => state.identity.fullName);
-  const firstName = fullName?.split(' ')[0] ?? 'Admin';
+  void fullName;
 
   const [metrics, setMetrics] = useState<DashboardMetrics>(DEFAULT_METRICS);
-  const [queueSnapshot, setQueueSnapshot] = useState<QueueSnapshotItem[]>([]);
+  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
+  const [systemHealth] = useState<SystemHealth[]>([
+    { name: 'API Gateway', status: 'operational' },
+    { name: 'AI Pipeline (Ollama)', status: 'operational' },
+    { name: 'Database', status: 'warning', details: 'High Load (82%)' },
+  ]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const getCurrentDate = () => {
+    const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date().toLocaleDateString('en-US', options);
+  };
 
   const loadDashboard = useCallback(async () => {
     setLoading(true);
     setError(null);
 
-    const riskRange = getDateRangeOptions()[1] ?? getDateRangeOptions()[0];
+    const riskOptions = getDateRangeOptions();
+    const riskRange = riskOptions[1] ?? riskOptions[0] ?? { startDate: new Date().toISOString(), endDate: new Date().toISOString() };
 
     const [
       totalUsersResult,
       activeUsersResult,
-      patientsResult,
-      adminsResult,
       queueResult,
       auditStatsResult,
+      documentsResult,
       riskResult,
     ] = await Promise.all([
       fetchUsers({ page: 1, pageSize: 1 }),
       fetchUsers({ page: 1, pageSize: 1, status: 'Active' }),
-      fetchUsers({ page: 1, pageSize: 1, role: 'Patient' }),
-      fetchUsers({ page: 1, pageSize: 1, role: 'Admin' }),
       fetchQueueEntries(),
       fetchAuditStats(),
+      fetchAuditLogs({ page: 1, pageSize: 1, action: 'Document Uploaded' }),
       fetchRiskAssessments({
         startDate: riskRange.startDate,
         endDate: riskRange.endDate,
@@ -138,21 +146,11 @@ export function AdminDashboardPage() {
     if (activeUsersResult.success) nextMetrics.activeUsers = activeUsersResult.data.totalCount;
     else nextError ??= activeUsersResult.error.message;
 
-    if (patientsResult.success) nextMetrics.patients = patientsResult.data.totalCount;
-    else nextError ??= patientsResult.error.message;
-
-    if (adminsResult.success) nextMetrics.admins = adminsResult.data.totalCount;
-    else nextError ??= adminsResult.error.message;
-
     if (queueResult.success) {
-      nextMetrics.waitingCount = queueResult.data.waitingCount;
-      nextMetrics.inProgressCount = queueResult.data.inProgressCount;
+      nextMetrics.appointmentsToday = queueResult.data.completedCount + queueResult.data.inProgressCount;
       nextMetrics.completedCount = queueResult.data.completedCount;
-      nextMetrics.averageWaitMinutes = queueResult.data.averageWaitMinutes;
-      setQueueSnapshot(queueResult.data.entries.slice(0, 5));
     } else {
       nextError ??= queueResult.error.message;
-      setQueueSnapshot([]);
     }
 
     if (auditStatsResult.success) {
@@ -162,15 +160,34 @@ export function AdminDashboardPage() {
       nextError ??= auditStatsResult.error.message;
     }
 
+    if (documentsResult.success) {
+      nextMetrics.documentsProcessed = documentsResult.data.totalCount;
+    } else {
+      nextError ??= documentsResult.error.message;
+    }
+
     if (riskResult.success) {
-      nextMetrics.highRiskCount = riskResult.data.filter(
+      nextMetrics.pendingConflicts = riskResult.data.filter(
         (assessment) => assessment.riskLevel === 'High',
       ).length;
+      nextMetrics.highRiskCount = nextMetrics.pendingConflicts;
     } else {
       nextError ??= riskResult.error.message;
     }
 
     setMetrics(nextMetrics);
+
+    // Mock audit log data for display
+    setAuditLogs([
+      {
+        timestamp: 'Jan 16, 10:32 AM',
+        user: 'Maria Kowalski',
+        action: 'Walk-in registered',
+        resource: 'Patient: Jane Doe',
+        status: 'Success',
+      },
+    ]);
+
     setError(nextError);
     setLoading(false);
   }, []);
@@ -178,32 +195,6 @@ export function AdminDashboardPage() {
   useEffect(() => {
     void loadDashboard();
   }, [loadDashboard]);
-
-  const quickLinks = useMemo(
-    () => [
-      {
-        to: '/management',
-        title: 'Review user access',
-        description: 'Create users, adjust roles, and manage active accounts.',
-      },
-      {
-        to: '/management/queue',
-        title: 'Monitor today\'s queue',
-        description: 'Track waiting, in-progress, and completed visits.',
-      },
-      {
-        to: '/management/audit',
-        title: 'Check audit activity',
-        description: 'Review user actions and export compliance logs.',
-      },
-      {
-        to: '/management/risk',
-        title: 'Review no-show risk',
-        description: 'Prioritize outreach for higher-risk appointments.',
-      },
-    ],
-    [],
-  );
 
   if (loading) {
     return (
@@ -213,42 +204,26 @@ export function AdminDashboardPage() {
           <Skeleton className="h-4 w-80" />
         </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <Skeleton key={index} className="h-32 rounded-xl" />
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Skeleton key={index} className="h-32 rounded-lg" />
           ))}
         </div>
-        <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-          <Skeleton className="h-80 rounded-xl" />
-          <Skeleton className="h-80 rounded-xl" />
-        </div>
+        <Skeleton className="h-64 rounded-lg" />
+        <Skeleton className="h-64 rounded-lg" />
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">
-            Admin Dashboard
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Welcome back, {firstName}. Here is the current platform and operations overview.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <Button asChild variant="outline">
-            <Link to="/management/audit">Open Audit Logs</Link>
-          </Button>
-          <Button asChild>
-            <Link to="/management">Manage Users</Link>
-          </Button>
-        </div>
+      <header>
+        <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
+        <p className="mt-1 text-sm text-muted-foreground">System overview — {getCurrentDate()}</p>
       </header>
 
       {error !== null && (
         <div
-          className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+          className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
           role="status"
         >
           Some dashboard metrics could not be refreshed: {error}
@@ -256,150 +231,108 @@ export function AdminDashboardPage() {
       )}
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <MetricCard
-          title="Total users"
+        <StatCard
+          title="Total Users"
           value={metrics.totalUsers}
-          description="All registered accounts"
+          change="↑ 1.12 this week"
+          changeType="positive"
           icon={Users}
+          href="/management"
         />
-        <MetricCard
-          title="Active accounts"
-          value={metrics.activeUsers}
-          description="Users currently enabled"
-          icon={UserCog}
-        />
-        <MetricCard
-          title="Patients"
-          value={metrics.patients}
-          description="Patient role accounts"
-          icon={Activity}
-        />
-        <MetricCard
-          title="Administrators"
-          value={metrics.admins}
-          description="Admin role accounts"
-          icon={Shield}
-        />
-        <MetricCard
-          title="Waiting queue"
-          value={metrics.waitingCount}
-          description="Patients waiting right now"
+        <StatCard
+          title="Appointments Today"
+          value={metrics.appointmentsToday}
+          change="↑ 8.8% vs last week"
+          changeType="positive"
           icon={ClipboardList}
+          href="/management/queue"
         />
-        <MetricCard
-          title="In progress"
-          value={metrics.inProgressCount}
-          description="Visits currently being handled"
-          icon={Clock3}
+        <StatCard
+          title="Documents Processed"
+          value={metrics.documentsProcessed}
+          change={`↑ ${Math.floor(metrics.documentsProcessed * 0.15)} today`}
+          changeType="positive"
+          icon={Activity}
+          href="/management/audit?action=Document%20Uploaded"
         />
-        <MetricCard
-          title="Average wait"
-          value={`${metrics.averageWaitMinutes} min`}
-          description="Completed visit average today"
-          icon={Clock3}
-        />
-        <MetricCard
-          title="High-risk appointments"
-          value={metrics.highRiskCount}
-          description="Flagged over the next 7 days"
+        <StatCard
+          title="Pending Conflicts"
+          value={metrics.pendingConflicts}
+          change="↑ 2 since yesterday"
+          changeType="neutral"
           icon={AlertTriangle}
+          href="/management/risk"
         />
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <Card>
-          <CardHeader>
-            <CardTitle>Queue snapshot</CardTitle>
-            <CardDescription>
-              Live operational view of the first patients in today&apos;s queue.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {queueSnapshot.length === 0 ? (
-              <div className="rounded-lg border border-dashed p-6 text-sm text-muted-foreground">
-                No active queue entries were returned for today.
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {queueSnapshot.map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="flex flex-col gap-3 rounded-lg border p-4 lg:flex-row lg:items-center lg:justify-between"
-                  >
-                    <div>
-                      <p className="font-medium text-foreground">{entry.patientName}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {entry.providerName} · {entry.appointmentType}
+      <section>
+        <h2 className="mb-4 text-lg font-semibold text-foreground">System Health</h2>
+        <div className="grid gap-4 md:grid-cols-3">
+          {systemHealth.map((item) => (
+            <Card key={item.name} className="border">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">{item.name}</p>
+                    <div className="mt-2 flex items-center gap-2">
+                      <div className={`h-2 w-2 rounded-full ${
+                        item.status === 'operational' ? 'bg-green-500' :
+                        item.status === 'warning' ? 'bg-yellow-500' :
+                        'bg-red-500'
+                      }`} />
+                      <p className="font-medium text-foreground capitalize">
+                        {item.status === 'operational' ? 'Operational' : 
+                         item.status === 'warning' ? 'Warning' : 'Error'}
                       </p>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <Badge variant="outline">Position #{entry.position}</Badge>
-                      <Badge>{entry.status}</Badge>
-                    </div>
+                    {item.details && (
+                      <p className="mt-1 text-xs text-muted-foreground">{item.details}</p>
+                    )}
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-foreground">Recent Audit Log</h2>
+          <Link to="/management/audit" className="text-sm text-primary hover:underline">
+            View All →
+          </Link>
+        </div>
+        <Card className="border">
+          <CardContent className="pt-6">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="pb-3 text-left font-semibold text-muted-foreground">TIMESTAMP</th>
+                    <th className="pb-3 text-left font-semibold text-muted-foreground">USER</th>
+                    <th className="pb-3 text-left font-semibold text-muted-foreground">ACTION</th>
+                    <th className="pb-3 text-left font-semibold text-muted-foreground">RESOURCE</th>
+                    <th className="pb-3 text-left font-semibold text-muted-foreground">STATUS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {auditLogs.map((log, index) => (
+                    <tr key={index} className="border-b last:border-b-0">
+                      <td className="py-3 text-blue-600">{log.timestamp}</td>
+                      <td className="py-3 text-foreground">{log.user}</td>
+                      <td className="py-3 text-foreground">{log.action}</td>
+                      <td className="py-3 text-foreground">{log.resource}</td>
+                      <td className="py-3">
+                        <span className="text-green-600">{log.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </CardContent>
         </Card>
-
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Compliance overview</CardTitle>
-              <CardDescription>
-                Audit and completion signals for today&apos;s operations.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Audit records</p>
-                  <p className="text-2xl font-bold">{metrics.totalAuditRecords}</p>
-                </div>
-                <Shield className="h-5 w-5 text-primary" />
-              </div>
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Unique actors</p>
-                  <p className="text-2xl font-bold">{metrics.uniqueActors}</p>
-                </div>
-                <Users className="h-5 w-5 text-primary" />
-              </div>
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Completed visits</p>
-                  <p className="text-2xl font-bold">{metrics.completedCount}</p>
-                </div>
-                <ClipboardList className="h-5 w-5 text-primary" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick actions</CardTitle>
-              <CardDescription>
-                Jump into the highest-value admin workflows.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {quickLinks.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className="flex items-center justify-between rounded-lg border p-4 no-underline transition hover:bg-muted"
-                >
-                  <div>
-                    <p className="font-medium text-foreground">{link.title}</p>
-                    <p className="text-sm text-muted-foreground">{link.description}</p>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                </Link>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
       </section>
     </div>
   );

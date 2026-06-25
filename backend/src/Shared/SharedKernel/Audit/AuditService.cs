@@ -133,10 +133,10 @@ public sealed class AuditService<TContext> : IAuditService where TContext : DbCo
             query = query.Where(a => a.ActorName.Contains(filter.ActorName));
 
         if (!string.IsNullOrWhiteSpace(filter.Action))
-            query = query.Where(a => a.Action == filter.Action);
+            query = query.Where(a => a.Action.Contains(filter.Action));
 
         if (!string.IsNullOrWhiteSpace(filter.Resource))
-            query = query.Where(a => a.Resource == filter.Resource);
+            query = query.Where(a => a.Resource.Contains(filter.Resource));
 
         if (!string.IsNullOrWhiteSpace(filter.ResourceId))
             query = query.Where(a => a.ResourceId == filter.ResourceId);

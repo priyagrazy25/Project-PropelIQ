@@ -37,10 +37,12 @@ public class AuditLogsController : ControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 50)
     {
+        var normalizedEndDate = NormalizeInclusiveEndDate(endDate);
+
         var filter = new AuditLogFilter
         {
             StartDate = startDate,
-            EndDate = endDate,
+            EndDate = normalizedEndDate,
             ActorName = actorName,
             Action = action,
             Resource = resource,
@@ -91,21 +93,47 @@ public class AuditLogsController : ControllerBase
         [FromQuery] DateTime? endDate,
         [FromQuery] string? actorName,
         [FromQuery] string? action,
-        [FromQuery] string? resource)
+        [FromQuery] string? resource,
+        [FromQuery] string? resourceId,
+        [FromQuery] string? ipAddress)
     {
+        var normalizedEndDate = NormalizeInclusiveEndDate(endDate);
+
         var filter = new AuditLogFilter
         {
-            StartDate = startDate ?? DateTime.UtcNow.AddDays(-30),
-            EndDate = endDate ?? DateTime.UtcNow,
+            StartDate = startDate,
+            EndDate = normalizedEndDate,
             ActorName = actorName,
             Action = action,
-            Resource = resource
+            Resource = resource,
+            ResourceId = resourceId,
+            IpAddress = ipAddress
         };
 
-        // Get all records (up to 10,000 for export)
-        var result = await _auditService.GetAuditLogsAsync(filter, 1, 10000);
+        // Collect all matching records page by page to avoid partial exports.
+        const int exportPageSize = 5000;
+        var allEntries = new List<AuditEntry>();
+        var page = 1;
 
-        var csv = GenerateCsv(result.Items);
+        while (true)
+        {
+            var result = await _auditService.GetAuditLogsAsync(filter, page, exportPageSize);
+            if (result.Items.Count == 0)
+            {
+                break;
+            }
+
+            allEntries.AddRange(result.Items);
+
+            if (allEntries.Count >= result.TotalCount)
+            {
+                break;
+            }
+
+            page++;
+        }
+
+        var csv = GenerateCsv(allEntries);
         var fileName = $"audit-logs-{DateTime.UtcNow:yyyyMMdd-HHmmss}.csv";
 
         return File(System.Text.Encoding.UTF8.GetBytes(csv), "text/csv", fileName);
@@ -167,6 +195,18 @@ public class AuditLogsController : ControllerBase
         if (string.IsNullOrEmpty(value))
             return string.Empty;
         return value.Replace("\"", "\"\"");
+    }
+
+    private static DateTime? NormalizeInclusiveEndDate(DateTime? endDate)
+    {
+        if (!endDate.HasValue)
+            return null;
+
+        // Date-picker values usually arrive at midnight; include the full day for filtering/export.
+        if (endDate.Value.TimeOfDay == TimeSpan.Zero)
+            return endDate.Value.Date.AddDays(1).AddTicks(-1);
+
+        return endDate;
     }
 }
 
