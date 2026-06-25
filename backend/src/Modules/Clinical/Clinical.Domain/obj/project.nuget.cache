@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "szPrB6Qxj5s=",
+  "dgSpecHash": "YPl/vkfaFV8=",
   "success": true,
-  "projectFilePath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Clinical\\Clinical.Domain\\Clinical.Domain.csproj",
+  "projectFilePath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Clinical\\Clinical.Domain\\Clinical.Domain.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\PriyatharshaniRajama\\.nuget\\packages\\microsoft.entityframeworkcore\\8.0.11\\microsoft.entityframeworkcore.8.0.11.nupkg.sha512",
     "C:\\Users\\PriyatharshaniRajama\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\8.0.11\\microsoft.entityframeworkcore.abstractions.8.0.11.nupkg.sha512",

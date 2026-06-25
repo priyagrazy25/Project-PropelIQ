@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Identity\\Identity.Infrastructure\\Identity.Infrastructure.csproj": {}
+    "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Identity\\Identity.Infrastructure\\Identity.Infrastructure.csproj": {}
   },
   "projects": {
-    "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Identity\\Identity.Application\\Identity.Application.csproj": {
+    "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Identity\\Identity.Application\\Identity.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Identity\\Identity.Application\\Identity.Application.csproj",
+        "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Identity\\Identity.Application\\Identity.Application.csproj",
         "projectName": "Identity.Application",
-        "projectPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Identity\\Identity.Application\\Identity.Application.csproj",
+        "projectPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Identity\\Identity.Application\\Identity.Application.csproj",
         "packagesPath": "C:\\Users\\PriyatharshaniRajama\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Identity\\Identity.Application\\obj\\",
+        "outputPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Identity\\Identity.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -33,8 +33,8 @@
             "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Identity\\Identity.Domain\\Identity.Domain.csproj": {
-                "projectPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Identity\\Identity.Domain\\Identity.Domain.csproj"
+              "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Identity\\Identity.Domain\\Identity.Domain.csproj": {
+                "projectPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Identity\\Identity.Domain\\Identity.Domain.csproj"
               }
             }
           }
@@ -99,14 +99,14 @@
         }
       }
     },
-    "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Identity\\Identity.Domain\\Identity.Domain.csproj": {
+    "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Identity\\Identity.Domain\\Identity.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Identity\\Identity.Domain\\Identity.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Identity\\Identity.Domain\\Identity.Domain.csproj",
         "projectName": "Identity.Domain",
-        "projectPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Identity\\Identity.Domain\\Identity.Domain.csproj",
+        "projectPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Identity\\Identity.Domain\\Identity.Domain.csproj",
         "packagesPath": "C:\\Users\\PriyatharshaniRajama\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Identity\\Identity.Domain\\obj\\",
+        "outputPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Identity\\Identity.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -128,8 +128,8 @@
             "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj": {
-                "projectPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj"
+              "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj": {
+                "projectPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj"
               }
             }
           }
@@ -184,14 +184,14 @@
         }
       }
     },
-    "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Identity\\Identity.Infrastructure\\Identity.Infrastructure.csproj": {
+    "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Identity\\Identity.Infrastructure\\Identity.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Identity\\Identity.Infrastructure\\Identity.Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Identity\\Identity.Infrastructure\\Identity.Infrastructure.csproj",
         "projectName": "Identity.Infrastructure",
-        "projectPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Identity\\Identity.Infrastructure\\Identity.Infrastructure.csproj",
+        "projectPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Identity\\Identity.Infrastructure\\Identity.Infrastructure.csproj",
         "packagesPath": "C:\\Users\\PriyatharshaniRajama\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Identity\\Identity.Infrastructure\\obj\\",
+        "outputPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Identity\\Identity.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -213,8 +213,8 @@
             "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Identity\\Identity.Application\\Identity.Application.csproj": {
-                "projectPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Identity\\Identity.Application\\Identity.Application.csproj"
+              "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Identity\\Identity.Application\\Identity.Application.csproj": {
+                "projectPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Identity\\Identity.Application\\Identity.Application.csproj"
               }
             }
           }
@@ -287,14 +287,14 @@
         }
       }
     },
-    "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj": {
+    "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj",
+        "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj",
         "projectName": "SharedKernel",
-        "projectPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj",
+        "projectPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj",
         "packagesPath": "C:\\Users\\PriyatharshaniRajama\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Shared\\SharedKernel\\obj\\",
+        "outputPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Shared\\SharedKernel\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

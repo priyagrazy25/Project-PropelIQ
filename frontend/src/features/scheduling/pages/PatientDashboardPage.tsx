@@ -67,9 +67,18 @@ function badgeVariant(
     case 'cancelled':
     case 'noshow':
       return 'destructive';
+    case 'completed':
+      return 'secondary';
     default:
       return 'secondary';
   }
+}
+
+function resolveDisplayStatus(appt: MyAppointment, isInPastTab: boolean): string {
+  if (isInPastTab && ACTIVE_STATUSES.has(appt.status)) {
+    return 'Completed';
+  }
+  return appt.status;
 }
 
 export function PatientDashboardPage() {
@@ -115,6 +124,7 @@ export function PatientDashboardPage() {
     void loadData();
   }, [loadData]);
 
+<<<<<<< HEAD
   useEffect(() => {
     const state = location.state as
       | { refreshDashboard?: number }
@@ -129,11 +139,25 @@ export function PatientDashboardPage() {
     () => appointments.filter((a) => ACTIVE_STATUSES.has(a.status)),
     [appointments],
   );
+=======
+  const upcoming = useMemo(() => {
+    const now = new Date();
+    return appointments.filter(
+      (a) =>
+        ACTIVE_STATUSES.has(a.status) &&
+        new Date(a.appointmentDateTime) >= now,
+    );
+  }, [appointments]);
+>>>>>>> origin/main
 
-  const past = useMemo(
-    () => appointments.filter((a) => !ACTIVE_STATUSES.has(a.status)),
-    [appointments],
-  );
+  const past = useMemo(() => {
+    const now = new Date();
+    return appointments.filter(
+      (a) =>
+        !ACTIVE_STATUSES.has(a.status) ||
+        new Date(a.appointmentDateTime) < now,
+    );
+  }, [appointments]);
 
   const activeWaitlist = useMemo(
     () =>
@@ -305,8 +329,8 @@ export function PatientDashboardPage() {
                           {formatDateTime(appt.appointmentDateTime)}
                         </TableCell>
                         <TableCell>
-                          <Badge variant={badgeVariant(appt.status)}>
-                            {appt.status}
+                          <Badge variant={badgeVariant(resolveDisplayStatus(appt, activeTab === 'past'))}>
+                            {resolveDisplayStatus(appt, activeTab === 'past')}
                           </Badge>
                         </TableCell>
                         {activeTab === 'upcoming' && (

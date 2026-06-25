@@ -35,7 +35,7 @@ public sealed class RedisCacheService : ICacheService
                 return null;
             }
 
-            return JsonSerializer.Deserialize<T>(value!, SerializerOptions);
+            return JsonSerializer.Deserialize<T>((string)value!, SerializerOptions);
         }
         catch (RedisConnectionException ex)
         {

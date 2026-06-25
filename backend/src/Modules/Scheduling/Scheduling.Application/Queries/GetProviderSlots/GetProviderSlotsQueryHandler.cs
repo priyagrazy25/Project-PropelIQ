@@ -30,11 +30,14 @@ public sealed class GetProviderSlotsQueryHandler
 
         var date = query.Date?.Date ?? DateTime.UtcNow.Date;
         var dateEnd = date.AddDays(1);
+        // For today, only return slots that haven't started yet; for future dates, return all day's slots
+        var now = DateTime.UtcNow;
+        var startCutoff = date == now.Date ? now : date;
 
         var slots = await _dbContext.AppointmentSlots
             .AsNoTracking()
             .Where(s => s.ProviderId == query.ProviderId
-                        && s.StartTime >= date
+                        && s.StartTime >= startCutoff
                         && s.StartTime < dateEnd)
             .OrderBy(s => s.StartTime)
             .Select(s => new SlotDto(

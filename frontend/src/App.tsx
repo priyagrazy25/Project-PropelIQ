@@ -27,6 +27,7 @@ import { LoginPage } from './features/identity/pages/LoginPage';
 import { RegistrationPage } from './features/identity/pages/RegistrationPage';
 import { CalendarSyncPage } from './features/notification/pages/CalendarSyncPage';
 import { BookingConfirmationPage } from './features/scheduling/pages/BookingConfirmationPage';
+import { ProviderProfilePage } from './features/scheduling/pages/ProviderProfilePage';
 import { NoShowRiskDashboardPage } from './features/scheduling/pages/NoShowRiskDashboardPage';
 import { PatientDashboardPage } from './features/scheduling/pages/PatientDashboardPage';
 import { ProviderSearchPage } from './features/scheduling/pages/ProviderSearchPage';
@@ -193,6 +194,7 @@ const router = createBrowserRouter([
           { path: '/documents', element: <DocumentUploadPage /> },
           { path: '/documents/processing', element: <ProcessingStatusPage /> },
           { path: '/health-profile', element: <PatientView360Page /> },
+          { path: '/providers/:id', element: <ProviderProfilePage /> },
           { path: '/clinical/conflicts/:conflictId', element: <ConflictResolutionPage /> },
         ],
       },
