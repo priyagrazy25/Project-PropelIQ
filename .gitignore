@@ -1,0 +1,82 @@
+﻿## .NET / C# gitignore
+
+# Build outputs
+bin/
+obj/
+out/
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+!packages/repositories.config
+*.lock.json
+!packages.lock.json
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# VS Code
+.vscode/
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+coverage*/
+coverlet.runsettings.user
+
+# Publish
+publish/
+PublishProfiles/
+
+# Entity Framework migrations (optional – remove if you want to track migrations)
+# Migrations/
+
+# Logs
+logs/
+*.log
+
+# Secrets / config overrides
+appsettings.*.json
+!appsettings.json
+!appsettings.Development.json
+secrets.json
+*.pfx
+*.p12
+*.key
+*.pem
+*.cer
+
+# ML models (large binary files)
+ml-models/
+
+# Tessdata (large binary files)
+tessdata/
+
+# OS artefacts
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Rider
+.idea/
+*.sln.iml
+
+# ReSharper
+_ReSharper*/
+*.ReSharper
+*.DotSettings.user
+
+# Backup / temp files
+*.bak
+*.tmp
+*.swp
+*~
