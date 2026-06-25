@@ -9,6 +9,7 @@ interface ProviderCardProps {
   provider: ProviderResult;
   onBookAppointment?: (provider: ProviderResult, slot: ProviderSlot) => void;
   onJoinWaitlist?: (provider: ProviderResult) => void;
+  onViewProfile?: (provider: ProviderResult) => void;
   showUnavailableSlots?: boolean;
 }
 
@@ -34,6 +35,7 @@ export function ProviderCard({
   provider,
   onBookAppointment,
   onJoinWaitlist,
+  onViewProfile,
   showUnavailableSlots = false,
 }: ProviderCardProps) {
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
@@ -152,6 +154,8 @@ export function ProviderCard({
           variant="outline"
           size="sm"
           className="border-[#1E6F9F] text-[#1E6F9F] hover:bg-blue-50"
+          aria-label={`View profile for ${provider.fullName}`}
+          onClick={() => onViewProfile?.(provider)}
         >
           View Profile
         </Button>

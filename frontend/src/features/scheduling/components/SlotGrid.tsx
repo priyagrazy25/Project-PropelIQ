@@ -23,7 +23,12 @@ export function SlotGrid({
   onSelectSlot,
   dateLabel,
 }: SlotGridProps) {
-  const availableSlots = slots.filter((s) => s.isAvailable);
+  const now = new Date();
+  const availableSlots = slots.filter(
+    (s) =>
+      s.isAvailable &&
+      new Date(s.startTime.endsWith('Z') ? s.startTime : s.startTime + 'Z') > now
+  );
 
   if (availableSlots.length === 0) {
     return (
