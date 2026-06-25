@@ -252,9 +252,8 @@ export function AdminUserManagementPage() {
         >
           <option value="">All Roles</option>
           <option value="Admin">Admin</option>
-          <option value="Provider">Provider</option>
-          <option value="FrontDesk">Front Desk</option>
           <option value="Patient">Patient</option>
+          <option value="FrontDesk">Staff</option>
         </select>
         <select
           className="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"

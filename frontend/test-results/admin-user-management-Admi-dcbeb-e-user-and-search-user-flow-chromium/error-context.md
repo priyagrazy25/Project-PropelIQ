@@ -14,14 +14,14 @@
 ```
 Error: expect(locator).toBeVisible() failed
 
-Locator: getByRole('cell', { name: 'Playwright User1781603849452' })
+Locator: getByRole('cell', { name: 'Playwright User1781606729532' })
 Expected: visible
 Timeout: 5000ms
 Error: element(s) not found
 
 Call log:
   - Expect "toBeVisible" with timeout 5000ms
-  - waiting for getByRole('cell', { name: 'Playwright User1781603849452' })
+  - waiting for getByRole('cell', { name: 'Playwright User1781606729532' })
 
 ```
 
@@ -166,7 +166,7 @@ Call log:
         - cell "Edit Deactivate":
           - button "Edit"
           - button "Deactivate"
-  - text: Showing 1–10 of 12
+  - text: Showing 1–10 of 13
   - button "Previous page" [disabled]: Prev
   - button "Next page": Next
 - region "Notifications alt+T"

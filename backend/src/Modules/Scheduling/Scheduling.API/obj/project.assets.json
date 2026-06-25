@@ -1016,11 +1016,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Scheduling\\Scheduling.API\\Scheduling.API.csproj",
+      "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Scheduling\\Scheduling.API\\Scheduling.API.csproj",
       "projectName": "Scheduling.API",
-      "projectPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Scheduling\\Scheduling.API\\Scheduling.API.csproj",
+      "projectPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Scheduling\\Scheduling.API\\Scheduling.API.csproj",
       "packagesPath": "C:\\Users\\PriyatharshaniRajama\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Scheduling\\Scheduling.API\\obj\\",
+      "outputPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Scheduling\\Scheduling.API\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -1042,11 +1042,11 @@
           "framework": "net8.0",
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Scheduling\\Scheduling.Application\\Scheduling.Application.csproj": {
-              "projectPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Modules\\Scheduling\\Scheduling.Application\\Scheduling.Application.csproj"
+            "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Scheduling\\Scheduling.Application\\Scheduling.Application.csproj": {
+              "projectPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Modules\\Scheduling\\Scheduling.Application\\Scheduling.Application.csproj"
             },
-            "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj": {
-              "projectPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj"
+            "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj": {
+              "projectPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj"
             }
           }
         }

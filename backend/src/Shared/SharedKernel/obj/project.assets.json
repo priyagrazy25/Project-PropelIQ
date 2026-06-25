@@ -756,11 +756,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj",
+      "projectUniqueName": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj",
       "projectName": "SharedKernel",
-      "projectPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj",
+      "projectPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Shared\\SharedKernel\\SharedKernel.csproj",
       "packagesPath": "C:\\Users\\PriyatharshaniRajama\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\PriyatharshaniRajama\\PropelIQ\\unified-patient-access-platform\\backend\\src\\Shared\\SharedKernel\\obj\\",
+      "outputPath": "C:\\Users\\PriyatharshaniRajama\\Demo-propelIQ\\backend\\src\\Shared\\SharedKernel\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

@@ -11,3 +11,16 @@ C:\Users\PriyatharshaniRajama\PropelIQ\unified-patient-access-platform\backend\s
 C:\Users\PriyatharshaniRajama\PropelIQ\unified-patient-access-platform\backend\src\Shared\SharedKernel\obj\Debug\net8.0\refint\SharedKernel.dll
 C:\Users\PriyatharshaniRajama\PropelIQ\unified-patient-access-platform\backend\src\Shared\SharedKernel\obj\Debug\net8.0\SharedKernel.pdb
 C:\Users\PriyatharshaniRajama\PropelIQ\unified-patient-access-platform\backend\src\Shared\SharedKernel\obj\Debug\net8.0\ref\SharedKernel.dll
+C:\Users\PriyatharshaniRajama\Demo-propelIQ\backend\src\Shared\SharedKernel\bin\Debug\net8.0\SharedKernel.deps.json
+C:\Users\PriyatharshaniRajama\Demo-propelIQ\backend\src\Shared\SharedKernel\bin\Debug\net8.0\SharedKernel.dll
+C:\Users\PriyatharshaniRajama\Demo-propelIQ\backend\src\Shared\SharedKernel\bin\Debug\net8.0\SharedKernel.pdb
+C:\Users\PriyatharshaniRajama\Demo-propelIQ\backend\src\Shared\SharedKernel\obj\Debug\net8.0\SharedKernel.csproj.AssemblyReference.cache
+C:\Users\PriyatharshaniRajama\Demo-propelIQ\backend\src\Shared\SharedKernel\obj\Debug\net8.0\SharedKernel.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\PriyatharshaniRajama\Demo-propelIQ\backend\src\Shared\SharedKernel\obj\Debug\net8.0\SharedKernel.AssemblyInfoInputs.cache
+C:\Users\PriyatharshaniRajama\Demo-propelIQ\backend\src\Shared\SharedKernel\obj\Debug\net8.0\SharedKernel.AssemblyInfo.cs
+C:\Users\PriyatharshaniRajama\Demo-propelIQ\backend\src\Shared\SharedKernel\obj\Debug\net8.0\SharedKernel.csproj.CoreCompileInputs.cache
+C:\Users\PriyatharshaniRajama\Demo-propelIQ\backend\src\Shared\SharedKernel\obj\Debug\net8.0\SharedKernel.sourcelink.json
+C:\Users\PriyatharshaniRajama\Demo-propelIQ\backend\src\Shared\SharedKernel\obj\Debug\net8.0\SharedKernel.dll
+C:\Users\PriyatharshaniRajama\Demo-propelIQ\backend\src\Shared\SharedKernel\obj\Debug\net8.0\refint\SharedKernel.dll
+C:\Users\PriyatharshaniRajama\Demo-propelIQ\backend\src\Shared\SharedKernel\obj\Debug\net8.0\SharedKernel.pdb
+C:\Users\PriyatharshaniRajama\Demo-propelIQ\backend\src\Shared\SharedKernel\obj\Debug\net8.0\ref\SharedKernel.dll
