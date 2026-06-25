@@ -124,7 +124,6 @@ export function PatientDashboardPage() {
     void loadData();
   }, [loadData]);
 
-<<<<<<< HEAD
   useEffect(() => {
     const state = location.state as
       | { refreshDashboard?: number }
@@ -135,11 +134,6 @@ export function PatientDashboardPage() {
     }
   }, [location.state, loadData]);
 
-  const upcoming = useMemo(
-    () => appointments.filter((a) => ACTIVE_STATUSES.has(a.status)),
-    [appointments],
-  );
-=======
   const upcoming = useMemo(() => {
     const now = new Date();
     return appointments.filter(
@@ -148,7 +142,6 @@ export function PatientDashboardPage() {
         new Date(a.appointmentDateTime) >= now,
     );
   }, [appointments]);
->>>>>>> origin/main
 
   const past = useMemo(() => {
     const now = new Date();
