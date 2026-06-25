@@ -29,6 +29,17 @@ public class ConflictResolutionController : ControllerBase
     }
 
     /// <summary>
+    /// Returns the count of open data conflicts (used by staff dashboard).
+    /// </summary>
+    [HttpGet("open-count")]
+    [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetOpenConflictCount(CancellationToken cancellationToken = default)
+    {
+        var count = await _resolutionService.GetOpenConflictCountAsync(cancellationToken);
+        return Ok(count);
+    }
+
+    /// <summary>
     /// Gets detailed conflict information for resolution UI (AC-1).
     /// </summary>
     /// <param name="conflictId">Conflict ID.</param>

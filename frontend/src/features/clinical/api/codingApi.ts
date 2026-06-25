@@ -344,6 +344,34 @@ export async function fetchAgreementRate(): Promise<
   }
 }
 
+/**
+ * Returns the count of open data conflicts (used by staff dashboard SCR-021).
+ */
+export async function fetchOpenConflictsCount(): Promise<
+  | { success: true; data: number }
+  | { success: false; error: string }
+> {
+  try {
+    const token = getAccessToken();
+    const response = await fetch(`${API_BASE}/clinical/conflicts/open-count`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+
+    if (!response.ok) {
+      return { success: false, error: `Failed to fetch conflict count: ${response.status}` };
+    }
+
+    const count = (await response.json()) as number;
+    return { success: true, data: count };
+  } catch {
+    return { success: false, error: 'Network error. Unable to fetch conflict count.' };
+  }
+}
+
 /** Demo agreement rate data. */
 export function getDemoAgreementRate(): AgreementRateResponse {
   const now = new Date();

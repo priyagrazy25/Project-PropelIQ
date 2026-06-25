@@ -111,8 +111,8 @@ Build the patient self-registration form component with email validation, demogr
 - [x] Inline validation fires on blur with descriptive messages
 - [x] API error displays global error banner with retry action
 - [x] Successful registration navigates to login page
-- [ ] **[UI Tasks]** Visual comparison against wireframe completed at 375px, 768px, 1440px
-- [ ] **[UI Tasks]** Run `/analyze-ux` to validate wireframe alignment
+- [x] **[UI Tasks]** Visual comparison against wireframe completed at 375px, 768px, 1440px
+- [x] **[UI Tasks]** Run `/analyze-ux` to validate wireframe alignment
 
 ## Implementation Checklist
 - [x] Create RegistrationForm component with controlled inputs for all demographic fields
@@ -122,4 +122,4 @@ Build the patient self-registration form component with email validation, demogr
 - [x] Handle success → navigate to login; handle 409 duplicate email inline
 - [x] Add ARIA labels, keyboard navigation, and focus management
 - [x] **[UI Tasks - MANDATORY]** Reference wireframe SCR-001 during implementation
-- [ ] **[UI Tasks - MANDATORY]** Validate UI matches wireframe before marking complete
+- [x] **[UI Tasks - MANDATORY]** Validate UI matches wireframe before marking complete

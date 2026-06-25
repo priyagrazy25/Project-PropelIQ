@@ -182,6 +182,12 @@
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Accessibility tokens */
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  --focus-ring-color: #1a73e8;
+  --min-touch-target: 44px;
 }
 
 /* ===== Dark Mode ===== */
@@ -267,6 +273,22 @@
   }
   h4 {
     @apply text-[18px] font-semibold leading-normal;
+  }
+
+  :where(a, button, [role='button'], input, select, textarea):focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  :where(button, [role='button'], a, input, select, textarea) {
+    touch-action: manipulation;
+  }
+
+  @media (max-width: 390px) {
+    :where(button, [role='button'], a) {
+      min-height: var(--min-touch-target);
+      min-width: var(--min-touch-target);
+    }
   }
 }
 

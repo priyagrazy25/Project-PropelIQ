@@ -36,11 +36,11 @@ post_date: "2026-04-16"
 
 - **Existing Tests:** None for this feature (frontend unit tests not yet established).
 - **Missing Tests (must add):**
-  - [ ] Unit: SearchFilters renders all filter inputs and calls onSearch on submit
-  - [ ] Unit: ProviderCard renders provider info, slots, and handles slot selection
-  - [ ] Unit: SlotGrid filters unavailable slots and renders time format correctly
-  - [ ] Unit: useSignalRSlots connects/disconnects and handles slot update events
-  - [ ] Integration: ProviderSearchPage search flow with mocked API responses
+  - [x] Unit: SearchFilters renders all filter inputs and calls onSearch on submit
+  - [x] Unit: ProviderCard renders provider info, slots, and handles slot selection
+  - [x] Unit: SlotGrid filters unavailable slots and renders time format correctly
+  - [x] Unit: useSignalRSlots connects/disconnects and handles slot update events
+  - [x] Integration: ProviderSearchPage search flow with mocked API responses
 
 ## Validation Results
 

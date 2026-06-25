@@ -109,7 +109,7 @@ Implement the 15-minute inactivity detection system with a pre-expiry timeout mo
 - [x] Countdown timer accurate to seconds
 - [x] "Stay Logged In" refreshes session and closes modal
 - [x] Auto-logout on countdown expiry redirects to login
-- [ ] **[UI Tasks]** Visual comparison against wireframe SCR-003
+- [x] **[UI Tasks]** Visual comparison against wireframe SCR-003
 
 ## Implementation Checklist
 - [x] Create useInactivityTimer hook with 15-minute threshold and activity event listeners
@@ -119,4 +119,4 @@ Implement the 15-minute inactivity detection system with a pre-expiry timeout mo
 - [x] Implement focus trap and ARIA live region for accessibility
 - [x] Handle unsaved form data warning before forced logout
 - [x] **[UI Tasks - MANDATORY]** Reference wireframe SCR-003 during implementation
-- [ ] **[UI Tasks - MANDATORY]** Validate UI matches wireframe before marking complete
+- [x] **[UI Tasks - MANDATORY]** Validate UI matches wireframe before marking complete

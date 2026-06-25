@@ -112,7 +112,7 @@ Build the login page with email/password form, JWT token management (access toke
 - [x] Invalid credentials display inline error message
 - [x] Token refresh works silently on access token expiry
 - [x] Protected routes redirect unauthenticated users to login
-- [ ] **[UI Tasks]** Visual comparison against wireframe SCR-002
+- [x] **[UI Tasks]** Visual comparison against wireframe SCR-002
 
 ## Implementation Checklist
 - [x] Create LoginForm component with email/password and loading state
@@ -122,4 +122,4 @@ Build the login page with email/password form, JWT token management (access toke
 - [x] Create ProtectedRoute wrapper checking auth state
 - [x] Display inline validation errors and lockout messages
 - [x] **[UI Tasks - MANDATORY]** Reference wireframe SCR-002 during implementation
-- [ ] **[UI Tasks - MANDATORY]** Validate UI matches wireframe before marking complete
+- [x] **[UI Tasks - MANDATORY]** Validate UI matches wireframe before marking complete

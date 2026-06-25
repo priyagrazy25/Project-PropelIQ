@@ -34,6 +34,7 @@ import { ProviderSearchPage } from './features/scheduling/pages/ProviderSearchPa
 import { QueueManagementPage } from './features/scheduling/pages/QueueManagementPage';
 import { RescheduleAppointmentPage } from './features/scheduling/pages/RescheduleAppointmentPage';
 import { WaitlistPage } from './features/scheduling/pages/WaitlistPage';
+import { StaffDashboardPage } from './features/scheduling/pages/StaffDashboardPage';
 import { WalkInBookingPage } from './features/scheduling/pages/WalkInBookingPage';
 import { clearAccessToken } from './shared/api/authInterceptor';
 import { AdminAppShell } from './shared/components/AdminAppShell';
@@ -201,7 +202,7 @@ const router = createBrowserRouter([
         path: '/queue',
         element: (
           <ProtectedRoute allowedRoles={['Provider', 'FrontDesk', 'Admin']}>
-            <div>Staff Queue (placeholder)</div>
+            <Navigate to="/staff/dashboard" replace />
           </ProtectedRoute>
         ),
       },
@@ -214,11 +215,7 @@ const router = createBrowserRouter([
         children: [
           {
             path: '/staff/dashboard',
-            element: (
-              <div className="placeholder-page">
-                Staff Dashboard &mdash; Coming Soon
-              </div>
-            ),
+            element: <StaffDashboardPage />,
           },
           { path: '/staff/walk-in', element: <WalkInBookingPage /> },
           { path: '/staff/queue', element: <QueueManagementPage /> },
@@ -237,6 +234,10 @@ const router = createBrowserRouter([
           {
             path: '/staff/risk',
             element: <NoShowRiskDashboardPage />,
+          },
+          {
+            path: '/staff/patient-view',
+            element: <PatientView360Page />,
           },
           {
             path: '/staff/patient-view/:patientId',

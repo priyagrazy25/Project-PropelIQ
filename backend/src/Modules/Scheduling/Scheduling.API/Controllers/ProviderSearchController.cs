@@ -3,9 +3,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 using Scheduling.Application.Abstractions;
 using Scheduling.Application.Queries.GetProviderSlots;
 using Scheduling.Application.Queries.SearchProviders;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Scheduling.API.Controllers;
 
@@ -95,6 +98,18 @@ public class ProviderSearchController : ControllerBase
                 statusCode: StatusCodes.Status500InternalServerError,
                 title: "Search Error");
         }
+
+        var payload = System.Text.Json.JsonSerializer.Serialize(result.Value);
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(payload));
+        var etag = $"\"{Convert.ToHexString(hash)}\"";
+
+        if (Request.Headers.TryGetValue(HeaderNames.IfNoneMatch, out var ifNoneMatch) &&
+            ifNoneMatch.Any(value => string.Equals(value, etag, StringComparison.Ordinal)))
+        {
+            return StatusCode(StatusCodes.Status304NotModified);
+        }
+
+        Response.Headers.ETag = etag;
 
         return Ok(result.Value);
     }

@@ -98,7 +98,7 @@ Build cancel and reschedule interfaces on the appointment detail view. Cancel sh
 - [x] Cancel shows confirmation dialog and updates status
 - [x] Reschedule opens slot picker and creates new appointment
 - [x] 409 Conflict on reschedule shows user-friendly prompt
-- [ ] Dashboard updates after cancel/reschedule
+- [x] Dashboard updates after cancel/reschedule
 - [x] **[UI Tasks]** Visual comparison against wireframe SCR-008
 
 ## Implementation Checklist
@@ -107,6 +107,6 @@ Build cancel and reschedule interfaces on the appointment detail view. Cancel sh
 - [x] Implement cancel mutation with optimistic status update and toast
 - [x] Create RescheduleAppointmentPage with slot re-selection flow
 - [x] Handle 409 Conflict with "Slot no longer available" prompt
-- [ ] Update patient dashboard after cancel/reschedule actions
+- [x] Update patient dashboard after cancel/reschedule actions
 - [x] **[UI Tasks - MANDATORY]** Reference wireframe SCR-008 during implementation
 - [x] **[UI Tasks - MANDATORY]** Validate UI matches wireframe before marking complete

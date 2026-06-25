@@ -112,7 +112,7 @@ Build the admin user management dashboard with a paginated data table of users, 
 - [x] Edit user form updates details inline
 - [x] Deactivate shows confirmation; success updates table
 - [x] Non-admin access returns 403 / redirect
-- [ ] **[UI Tasks]** Visual comparison against wireframe SCR-023
+- [x] **[UI Tasks]** Visual comparison against wireframe SCR-023
 
 ## Implementation Checklist
 - [x] Create AdminUserManagement page with Admin role guard
@@ -122,4 +122,4 @@ Build the admin user management dashboard with a paginated data table of users, 
 - [x] Add skeleton loading states and empty state handling
 - [x] Block self-deactivation with inline warning
 - [x] **[UI Tasks - MANDATORY]** Reference wireframe SCR-023 during implementation
-- [ ] **[UI Tasks - MANDATORY]** Validate UI matches wireframe before marking complete
+- [x] **[UI Tasks - MANDATORY]** Validate UI matches wireframe before marking complete

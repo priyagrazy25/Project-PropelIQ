@@ -54,6 +54,18 @@ public sealed class NoShowPredictionEngine : IDisposable
             }
             else
             {
+                if (!File.Exists(activeVersion.ModelPath))
+                {
+                    _logger.LogWarning(
+                        "Active model version {Version} is missing at {Path}. Training a replacement initial model.",
+                        activeVersion.Version,
+                        activeVersion.ModelPath);
+
+                    await TrainAndActivateInitialModelAsync(cancellationToken);
+                    _isInitialized = true;
+                    return;
+                }
+
                 // Load directly without acquiring lock (already held)
                 var (model, schema) = _trainer.LoadModel(activeVersion.ModelPath);
                 await LoadModelInternalAsync(model, schema, activeVersion.Version);

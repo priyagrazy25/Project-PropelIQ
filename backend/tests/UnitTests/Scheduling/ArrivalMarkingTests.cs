@@ -41,7 +41,7 @@ public class ArrivalMarkingTests : IDisposable
 
         _patientLookupMock
             .Setup(p => p.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PatientSearchResult(Guid.NewGuid(), Guid.NewGuid(), "Jane Doe", "jane@example.com", null, null));
+            .ReturnsAsync(new PatientSearchResult(Guid.NewGuid(), Guid.NewGuid(), "Jane Doe", "jane@example.com", null, null, "MRN-TEST1234"));
     }
 
     public void Dispose()

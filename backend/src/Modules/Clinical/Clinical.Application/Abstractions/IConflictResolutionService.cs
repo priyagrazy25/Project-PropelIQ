@@ -20,6 +20,11 @@ public interface IConflictResolutionService
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Returns the count of open data conflicts (used by staff dashboard).
+    /// </summary>
+    Task<int> GetOpenConflictCountAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Resolves a data conflict with the specified action (AC-2).
     /// Creates audit record and invalidates cache.
     /// </summary>

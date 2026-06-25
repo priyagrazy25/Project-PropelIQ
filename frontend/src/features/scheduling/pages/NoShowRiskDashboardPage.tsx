@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { ResponsiveTable, type ResponsiveTableColumn } from '@/components/common/ResponsiveTable';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { AlertTriangle, RefreshCw, Send } from 'lucide-react';
@@ -86,6 +87,78 @@ export function NoShowRiskDashboardPage() {
   const highRiskCount = useMemo(
     () => assessments.filter((a) => a.riskLevel === 'High').length,
     [assessments],
+  );
+
+  const tableColumns = useMemo<ResponsiveTableColumn<AppointmentRiskAssessment>[]>(
+    () => [
+      {
+        key: 'patient',
+        header: 'Patient',
+        render: (assessment) =>
+          assessment.patientName ? (
+            <span className="text-gray-900 font-medium">{assessment.patientName}</span>
+          ) : (
+            <span className="text-gray-400 italic">Unknown Patient</span>
+          ),
+      },
+      {
+        key: 'appointment',
+        header: 'Appointment',
+        className: 'text-sm text-gray-700',
+        render: (assessment) => formatAppointmentTime(assessment.appointmentDateTime),
+      },
+      {
+        key: 'provider',
+        header: 'Provider',
+        className: 'text-sm text-gray-700',
+        render: (assessment) => assessment.providerName,
+      },
+      {
+        key: 'risk-score',
+        header: 'Risk Score',
+        render: (assessment) => (
+          <RiskIndicator score={assessment.riskScore} level={assessment.riskLevel} showBar />
+        ),
+      },
+      {
+        key: 'risk-level',
+        header: 'Risk Level',
+        render: (assessment) => <RiskBadge level={assessment.riskLevel} />,
+      },
+      {
+        key: 'factors',
+        header: 'Contributing Factors',
+        render: (assessment) => (
+          <span className="text-xs text-gray-500 max-w-[200px] line-clamp-2">
+            {assessment.contributingFactors.join(', ') || 'None identified'}
+          </span>
+        ),
+      },
+      {
+        key: 'action',
+        header: 'Action',
+        render: (assessment) => (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleSendReminder(assessment.appointmentId)}
+            disabled={sendingReminder === assessment.appointmentId}
+            className={cn(
+              'text-xs min-h-11',
+              sendingReminder === assessment.appointmentId && 'opacity-50',
+            )}
+          >
+            {sendingReminder === assessment.appointmentId ? (
+              <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+            ) : (
+              <Send className="h-3 w-3 mr-1" />
+            )}
+            Send Reminder
+          </Button>
+        ),
+      },
+    ],
+    [handleSendReminder, sendingReminder],
   );
 
   const formatAppointmentTime = (dateTimeStr: string): string => {
@@ -228,93 +301,12 @@ export function NoShowRiskDashboardPage() {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full" role="grid" aria-label="No-show risk patients">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="text-left text-xs font-semibold uppercase tracking-wider text-gray-500 px-4 py-3">
-                    Patient
-                  </th>
-                  <th className="text-left text-xs font-semibold uppercase tracking-wider text-gray-500 px-4 py-3">
-                    Appointment
-                  </th>
-                  <th className="text-left text-xs font-semibold uppercase tracking-wider text-gray-500 px-4 py-3">
-                    Provider
-                  </th>
-                  <th className="text-left text-xs font-semibold uppercase tracking-wider text-gray-500 px-4 py-3">
-                    Risk Score
-                  </th>
-                  <th className="text-left text-xs font-semibold uppercase tracking-wider text-gray-500 px-4 py-3">
-                    Risk Level
-                  </th>
-                  <th className="text-left text-xs font-semibold uppercase tracking-wider text-gray-500 px-4 py-3">
-                    Contributing Factors
-                  </th>
-                  <th className="text-left text-xs font-semibold uppercase tracking-wider text-gray-500 px-4 py-3">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {assessments.map((assessment) => (
-                  <tr
-                    key={assessment.appointmentId}
-                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="px-4 py-3">
-                      {assessment.patientName ? (
-                        <span className="text-gray-900 font-medium">
-                          {assessment.patientName}
-                        </span>
-                      ) : (
-                        <span className="text-gray-400 italic">Unknown Patient</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-700">
-                      {formatAppointmentTime(assessment.appointmentDateTime)}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-700">
-                      {assessment.providerName}
-                    </td>
-                    <td className="px-4 py-3">
-                      <RiskIndicator
-                        score={assessment.riskScore}
-                        level={assessment.riskLevel}
-                        showBar
-                      />
-                    </td>
-                    <td className="px-4 py-3">
-                      <RiskBadge level={assessment.riskLevel} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="text-xs text-gray-500 max-w-[200px] line-clamp-2">
-                        {assessment.contributingFactors.join(', ') || 'None identified'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleSendReminder(assessment.appointmentId)}
-                        disabled={sendingReminder === assessment.appointmentId}
-                        className={cn(
-                          'text-xs',
-                          sendingReminder === assessment.appointmentId && 'opacity-50',
-                        )}
-                      >
-                        {sendingReminder === assessment.appointmentId ? (
-                          <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
-                        ) : (
-                          <Send className="h-3 w-3 mr-1" />
-                        )}
-                        Send Reminder
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ResponsiveTable
+            data={assessments}
+            columns={tableColumns}
+            getRowKey={(assessment) => assessment.appointmentId}
+            ariaLabel="No-show risk patients"
+          />
         )}
       </Card>
     </div>

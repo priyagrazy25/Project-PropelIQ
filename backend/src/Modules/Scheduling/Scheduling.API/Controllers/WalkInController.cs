@@ -45,20 +45,12 @@ public class WalkInController : ControllerBase
     /// <response code="400">Search query is empty.</response>
     [HttpGet("patients/search")]
     [ProducesResponseType(typeof(IReadOnlyList<PatientSearchResult>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> SearchPatients(
-        [FromQuery] string q,
+        [FromQuery] string? q,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(q))
-        {
-            return Problem(
-                detail: "Search query is required.",
-                statusCode: StatusCodes.Status400BadRequest,
-                title: "Validation Error");
-        }
 
-        var results = await _patientLookup.SearchAsync(q.Trim(), cancellationToken);
+        var results = await _patientLookup.SearchAsync(q?.Trim() ?? string.Empty, cancellationToken);
         return Ok(results);
     }
 

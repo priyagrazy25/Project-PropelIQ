@@ -25,13 +25,16 @@ public sealed class PatientLookupService : IPatientLookupService
         CancellationToken cancellationToken = default)
     {
         var normalizedQuery = query.ToLowerInvariant();
+        var isEmptyQuery = string.IsNullOrWhiteSpace(normalizedQuery);
 
         var results = await _identityDb.Users
             .AsNoTracking()
             .Where(u => u.Role == UserRole.Patient
                         && u.Status == UserStatus.Active
-                        && (u.FullName.ToLower().Contains(normalizedQuery)
-                            || u.Email.ToLower().Contains(normalizedQuery)))
+                        && (isEmptyQuery
+                            || u.FullName.ToLower().Contains(normalizedQuery)
+                            || u.Email.ToLower().Contains(normalizedQuery)
+                            || (u.ContactNumber != null && u.ContactNumber.Contains(normalizedQuery))))
             .Join(_identityDb.Patients.AsNoTracking(),
                   u => u.Id,
                   p => p.UserId,
@@ -41,7 +44,8 @@ public sealed class PatientLookupService : IPatientLookupService
                       u.FullName,
                       u.Email,
                       u.ContactNumber,
-                      u.DateOfBirth))
+                      u.DateOfBirth,
+                      "MRN-" + p.Id.ToString().Substring(0, 8).ToUpper()))
             .Take(20)
             .ToListAsync(cancellationToken);
 
@@ -64,7 +68,8 @@ public sealed class PatientLookupService : IPatientLookupService
                       u.FullName,
                       u.Email,
                       u.ContactNumber,
-                      u.DateOfBirth))
+                      u.DateOfBirth,
+                      "MRN-" + p.Id.ToString().Substring(0, 8).ToUpper()))
             .FirstOrDefaultAsync(cancellationToken);
 
         return result;
@@ -104,6 +109,7 @@ public sealed class PatientLookupService : IPatientLookupService
             user.FullName,
             user.Email,
             user.ContactNumber,
-            user.DateOfBirth);
+            user.DateOfBirth,
+            $"MRN-{patient.Id.ToString()[..8].ToUpperInvariant()}");
     }
 }

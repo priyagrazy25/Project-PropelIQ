@@ -226,17 +226,22 @@ public sealed class CodeVerificationService : ICodeVerificationService
         var periodEnd = DateTime.UtcNow;
         var periodStart = periodEnd.AddDays(-days);
 
-        // Get daily counts
-        var dailyCounts = await _dbContext.MedicalCodes
+        // Load the minimal shape first, then aggregate in memory to avoid provider translation issues.
+        var verifiedRows = await _dbContext.MedicalCodes
+            .AsNoTracking()
             .Where(mc => mc.VerifiedAt >= periodStart && mc.VerifiedAt <= periodEnd)
-            .GroupBy(mc => mc.VerifiedAt!.Value.Date)
+            .Select(mc => new { VerifiedAt = mc.VerifiedAt!.Value, mc.VerificationStatus })
+            .ToListAsync(cancellationToken);
+
+        var dailyCounts = verifiedRows
+            .GroupBy(row => row.VerifiedAt.Date)
             .Select(g => new DailyVerificationCount(
                 g.Key,
-                g.Count(mc => mc.VerificationStatus == VerificationStatus.Verified),
-                g.Count(mc => mc.VerificationStatus == VerificationStatus.Rejected),
-                g.Count(mc => mc.VerificationStatus == VerificationStatus.Overridden)))
+                g.Count(row => row.VerificationStatus == VerificationStatus.Verified),
+                g.Count(row => row.VerificationStatus == VerificationStatus.Rejected),
+                g.Count(row => row.VerificationStatus == VerificationStatus.Overridden)))
             .OrderBy(dc => dc.Date)
-            .ToListAsync(cancellationToken);
+            .ToList();
 
         // Calculate average verification time
         var verifiedCodes = await _dbContext.MedicalCodes
@@ -252,19 +257,23 @@ public sealed class CodeVerificationService : ICodeVerificationService
             ? verifiedCodes.Average(mc => (mc.VerifiedAt!.Value - mc.CreatedAt).TotalHours)
             : 0.0;
 
-        // Get top rejection reasons
-        var rejectionReasons = await _dbContext.MedicalCodes
+        // Get top rejection reasons.
+        var rejectionReasonRows = await _dbContext.MedicalCodes
             .AsNoTracking()
             .Where(mc =>
                 mc.VerifiedAt >= periodStart &&
                 mc.VerifiedAt <= periodEnd &&
                 mc.VerificationStatus == VerificationStatus.Rejected &&
                 mc.RejectionReason != null)
-            .GroupBy(mc => mc.RejectionReason!)
+            .Select(mc => mc.RejectionReason!)
+            .ToListAsync(cancellationToken);
+
+        var rejectionReasons = rejectionReasonRows
+            .GroupBy(reason => reason)
             .Select(g => new RejectionReasonCount(g.Key, g.Count()))
             .OrderByDescending(r => r.Count)
             .Take(5)
-            .ToListAsync(cancellationToken);
+            .ToList();
 
         return Result<VerificationStatistics>.Success(new VerificationStatistics
         {
