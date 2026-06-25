@@ -12,7 +12,7 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '../../../app/hooks';
-import { fetchAuditStats } from '../api/auditApi';
+import { fetchAuditLogs, fetchAuditStats } from '../api/auditApi';
 import { fetchUsers } from '../api/adminApi';
 import { fetchQueueEntries } from '../../scheduling/api/schedulingApi';
 import {
@@ -123,12 +123,14 @@ export function AdminDashboardPage() {
       activeUsersResult,
       queueResult,
       auditStatsResult,
+      documentsResult,
       riskResult,
     ] = await Promise.all([
       fetchUsers({ page: 1, pageSize: 1 }),
       fetchUsers({ page: 1, pageSize: 1, status: 'Active' }),
       fetchQueueEntries(),
       fetchAuditStats(),
+      fetchAuditLogs({ page: 1, pageSize: 1, action: 'Document Uploaded' }),
       fetchRiskAssessments({
         startDate: riskRange.startDate,
         endDate: riskRange.endDate,
@@ -154,9 +156,14 @@ export function AdminDashboardPage() {
     if (auditStatsResult.success) {
       nextMetrics.totalAuditRecords = auditStatsResult.data.totalRecords;
       nextMetrics.uniqueActors = auditStatsResult.data.uniqueActors;
-      nextMetrics.documentsProcessed = Math.floor(auditStatsResult.data.totalRecords * 0.3);
     } else {
       nextError ??= auditStatsResult.error.message;
+    }
+
+    if (documentsResult.success) {
+      nextMetrics.documentsProcessed = documentsResult.data.totalCount;
+    } else {
+      nextError ??= documentsResult.error.message;
     }
 
     if (riskResult.success) {
@@ -238,6 +245,7 @@ export function AdminDashboardPage() {
           change="↑ 8.8% vs last week"
           changeType="positive"
           icon={ClipboardList}
+          href="/management/queue"
         />
         <StatCard
           title="Documents Processed"
@@ -245,6 +253,7 @@ export function AdminDashboardPage() {
           change={`↑ ${Math.floor(metrics.documentsProcessed * 0.15)} today`}
           changeType="positive"
           icon={Activity}
+          href="/management/audit?action=Document%20Uploaded"
         />
         <StatCard
           title="Pending Conflicts"
@@ -252,6 +261,7 @@ export function AdminDashboardPage() {
           change="↑ 2 since yesterday"
           changeType="neutral"
           icon={AlertTriangle}
+          href="/management/risk"
         />
       </section>
 

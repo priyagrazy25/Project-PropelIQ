@@ -176,6 +176,8 @@ export async function exportAuditLogs(
     if (params.actorName) query.set('actorName', params.actorName);
     if (params.action) query.set('action', params.action);
     if (params.resource) query.set('resource', params.resource);
+    if (params.resourceId) query.set('resourceId', params.resourceId);
+    if (params.ipAddress) query.set('ipAddress', params.ipAddress);
 
     const response = await authenticatedFetch(`${API_BASE}/auditlogs/export?${query.toString()}`);
 
